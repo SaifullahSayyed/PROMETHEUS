@@ -124,37 +124,11 @@ User Input
 
 For demo purposes, everything runs locally with zero cloud costs.
 
----
 
-## Demo Script (6 Minutes)
-
-Use this for live judging demos:
-
-**0:00** — Open http://localhost:3000. Show the military war room aesthetic. Point out the 5 armed critic agents.
-
-**0:30** — Type: *"A freelance invoicing tool with time tracking and automated payment reminders"*. Click INITIATE MISSION.
-
-**0:45** — Navigate to the Mission HUD. Point out: 3-column layout, Phase Tracker (left), Survival Meter (center), Threat Intelligence feed (right).
-
-**1:00** — Watch GENESIS: The company name appears live. Point out the combat log streaming in real-time.
-
-**2:00** — Watch CONSTRUCTION: 4 parallel agents building the codebase. Show the file count ticking up.
-
-**3:00** — Watch ATTACK: Kill reports start appearing in the right column. Point out severity levels. Survival score starts dropping. "CRITICAL open threats = -15% each."
-
-**4:00** — Watch DEFENSE: Reports flip from OPEN to PATCHED or CHALLENGED. Score climbs. Point out the arbiter dismissing low-threat items.
-
-**5:00** — Score hits 100%. DEPLOY button unlocks, glows green. Click DEPLOY SURVIVOR.
-
-**5:30** — Live URL appears. Click it. Show a polished landing page for the generated company — complete with features, pricing, badges.
-
-**6:00** — "PROMETHEUS built, attacked, defended, and deployed a complete company in under 6 minutes. Zero human code written."
-
----
 
 ## Team
 
-Add your team members here.
+BUG-A-BOO
 
 ---
 
