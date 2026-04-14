@@ -84,7 +84,7 @@ Output ONLY the raw JSON object. No markdown. No explanation."""
         retry_message = f"""Problem statement: {prompt}
 PREVIOUS ATTEMPT FAILED WITH ERROR: {str(e)}
 The previous JSON had a parsing error. Fix it and output ONLY valid JSON matching the SharedContract schema.
-No markdown. No explanation. Raw JSON only starting with {  and ending with } ."""
+No markdown. No explanation. Raw JSON only starting with {{  and ending with }} ."""
         raw2 = await gemini_generate(
             prompt=retry_message,
             system_prompt=BLUEPRINT_SYSTEM,

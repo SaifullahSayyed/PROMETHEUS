@@ -132,14 +132,7 @@ async def preview_mission(mission_id: str):
         <div class='stat'><span class='stat-num'>{mission.survival_score:.0f}%</span><span class='stat-label'>Survival Score</span></div>
         <div class='stat'><span class='stat-num'>{len(mission.generated_files)}</span><span class='stat-label'>Files Generated</span></div>
     """
-    return HTMLResponse(f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>{company_name} — Built by PROMETHEUS</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="{tagline}">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
+    css_string = """
 *, *::before, *::after {  margin:0; padding:0; box-sizing:border-box; } 
 :root { 
   --bg: #080810;
@@ -221,6 +214,16 @@ footer p {  margin-top: 16px; font-size: 13px; color: var(--muted); }
   .stats-bar {  gap: 30px; flex-wrap: wrap; } 
   h1 {  letter-spacing: -1px; } 
 } 
+"""
+    return HTMLResponse(f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>{company_name} — Built by PROMETHEUS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="{tagline}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+{css_string}
 </style>
 </head>
 <body>
