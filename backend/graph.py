@@ -1,19 +1,52 @@
 import asyncio
 import json
+import os
+from pathlib import Path
 from typing import Optional
 from models.mission import Mission
 from agents import builder, defender
 from agents.critics import CRITICS
+
 _missions: dict[str, Mission] = {}
 _sse_queues: dict[str, asyncio.Queue] = {}
+
+DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
+DEMO_MISSIONS_DIR = Path(__file__).parent / "demo_missions"
+
+DEMO_IDS = {
+    "demo-classpay-001": "classpay.json",
+    "demo-freelancer-002": "billdr.json",
+    "demo-foodmkt-003": "cultivar.json",
+}
+
+def _load_demo_fixture(mission_id: str) -> Optional[Mission]:
+    filename = DEMO_IDS.get(mission_id)
+    if not filename:
+        return None
+    path = DEMO_MISSIONS_DIR / filename
+    if not path.exists():
+        return None
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return Mission(**data)
+
 def get_mission(mission_id: str) -> Optional[Mission]:
-    return _missions.get(mission_id)
+    if mission_id in _missions:
+        return _missions[mission_id]
+    if mission_id in DEMO_IDS:
+        mission = _load_demo_fixture(mission_id)
+        if mission:
+            _missions[mission_id] = mission
+        return mission
+    return None
+
 def store_mission(mission: Mission):
     _missions[mission.id] = mission
+
 def get_queue(mission_id: str) -> asyncio.Queue:
     if mission_id not in _sse_queues:
         _sse_queues[mission_id] = asyncio.Queue()
     return _sse_queues[mission_id]
+
 async def emit(mission_id: str, event_type: str, data: dict):
     queue = get_queue(mission_id)
     await queue.put({"type": event_type, "data": data})
@@ -26,12 +59,98 @@ async def emit(mission_id: str, event_type: str, data: dict):
                 data.get("level", "INFO")
             )
             store_mission(mission)
+
+async def _replay_demo(mission_id: str):
+    mission = _load_demo_fixture(mission_id)
+    if not mission:
+        return
+    store_mission(mission)
+    await asyncio.sleep(0.3)
+
+    queue = get_queue(mission_id)
+
+    await queue.put({"type": "phase_change", "data": {"phase": "GENESIS", "message": "Generating company blueprint..."}})
+    await asyncio.sleep(1.2)
+
+    await queue.put({"type": "phase_change", "data": {"phase": "GENESIS_COMPLETE", "company_name": mission.contract.company_name, "tagline": mission.contract.tagline}})
+    await asyncio.sleep(0.8)
+
+    await queue.put({"type": "phase_change", "data": {"phase": "CONSTRUCTION", "message": "Building MVP with parallel agents..."}})
+    for log in mission.combat_log[:8]:
+        await asyncio.sleep(0.4)
+        await queue.put({"type": "log_entry", "data": {"agent": log.agent, "message": log.message, "level": log.level}})
+
+    await asyncio.sleep(0.8)
+    await queue.put({"type": "phase_change", "data": {"phase": "ATTACK", "message": "Critic council activated. 5 agents deploying..."}})
+    await asyncio.sleep(0.5)
+
+    for report in mission.kill_reports:
+        await asyncio.sleep(0.6)
+        await queue.put({"type": "kill_report", "data": report.model_dump()})
+        await queue.put({"type": "log_entry", "data": {
+            "agent": "SYSTEM",
+            "message": f"[{report.severity}] {report.title}",
+            "level": "WARNING"
+        }})
+
+    await asyncio.sleep(0.5)
+    await queue.put({"type": "score_update", "data": {
+        "score": 55.0,
+        "resolved": 0,
+        "total": len(mission.kill_reports)
+    }})
+
+    await asyncio.sleep(1.0)
+    await queue.put({"type": "phase_change", "data": {"phase": "DEFENSE", "message": "Autonomous defense loop initiated..."}})
+    await asyncio.sleep(0.5)
+
+    resolved = 0
+    for report in mission.kill_reports:
+        await asyncio.sleep(0.8)
+        report_data = report.model_dump()
+        await queue.put({"type": "kill_report", "data": report_data})
+        resolved += 1
+        await queue.put({"type": "score_update", "data": {
+            "score": min(100.0, (resolved / len(mission.kill_reports)) * 100),
+            "resolved": resolved,
+            "total": len(mission.kill_reports)
+        }})
+        await queue.put({"type": "log_entry", "data": {
+            "agent": "DEFENDER",
+            "message": f"{'PATCHED' if report.status == 'PATCHED' else 'DISMISSED'} [{report.severity}] {report.title}",
+            "level": "SUCCESS"
+        }})
+
+    await asyncio.sleep(1.0)
+    await queue.put({"type": "phase_change", "data": {"phase": "DEPLOYING", "message": "Packaging survivor for deployment..."}})
+    await asyncio.sleep(1.5)
+
+    mission.survival_score = 100.0
+    mission.status = "DEPLOYED"
+    store_mission(mission)
+
+    await queue.put({"type": "score_update", "data": {"score": 100.0, "resolved": len(mission.kill_reports), "total": len(mission.kill_reports)}})
+    await queue.put({"type": "deploy_complete", "data": {
+        "url": mission.deploy_url,
+        "survival_score": 100.0,
+        "total_reports": len(mission.kill_reports),
+        "company_name": mission.contract.company_name,
+        "tagline": mission.contract.tagline
+    }})
+    await queue.put({"type": "complete", "status": "DEPLOYED"})
+
 async def run_pipeline(mission_id: str):
+    if mission_id in DEMO_IDS:
+        await _replay_demo(mission_id)
+        return
+
     mission = get_mission(mission_id)
     if not mission:
         return
+
     async def emit_fn(event_type: str, data: dict):
         await emit(mission_id, event_type, data)
+
     try:
         mission.status = "GENESIS"
         mission.current_phase = "GENESIS"
@@ -60,7 +179,7 @@ async def run_pipeline(mission_id: str):
         await emit_fn("phase_change", {"phase": "ATTACK", "message": "Critic council activated. 5 agents deploying..."})
         mission.add_log("SYSTEM", "All 5 critic agents deployed simultaneously.", "WARNING")
         store_mission(mission)
-        critic_tasks = list(CRITICS.items())  
+        critic_tasks = list(CRITICS.items())
         all_report_lists = []
         for critic_type, critic_fn in critic_tasks:
             try:

@@ -1,0 +1,267 @@
+{
+  "id": "demo-foodmkt-003",
+  "created_at": "2026-04-14T06:10:00",
+  "input_prompt": "A marketplace for local food producers to sell directly to restaurants with order management",
+  "status": "DEPLOYED",
+  "current_phase": "DEPLOYED",
+  "survival_score": 100.0,
+  "deploy_url": "https://prometheus-preview.fly.dev/preview/demo-foodmkt-003",
+  "error": null,
+  "contract": {
+    "company_name": "Cultivar",
+    "tagline": "Farm-to-table, automated. Direct sourcing for serious kitchens.",
+    "problem_statement": "Restaurants spend 12-15 hours per week calling farms, co-ops, and distributors to source fresh, local ingredients. Local farms can't compete with Sysco's ordering convenience even when their product quality is superior. 43% of small farms report losing restaurant clients not due to quality but due to ordering friction — no digital catalog, no real-time availability, no integrated invoicing.",
+    "target_users": [
+      "Independent restaurant chefs and kitchen managers sourcing local/seasonal ingredients",
+      "Local farms and food producers with 2-50 restaurant clients doing $100K-$2M annual revenue",
+      "Farm-to-table restaurants prioritizing local sourcing with $500K-$5M annual revenue",
+      "Food co-ops and regional food hubs managing 20-100 producer members"
+    ],
+    "core_features": [
+      {
+        "id": "feat_001",
+        "name": "Producer Storefront & Inventory",
+        "description": "Farms publish weekly availability with real-time inventory, seasonal notes, certifications (organic, GAP), and harvest dates.",
+        "priority": "P0",
+        "user_story": "As a farmer, I want to publish my weekly availability digitally so that restaurants can order without calling me."
+      },
+      {
+        "id": "feat_002",
+        "name": "Restaurant Smart Ordering",
+        "description": "Chefs build standing orders, set recurring deliveries, and get availability notifications for seasonal specials.",
+        "priority": "P0",
+        "user_story": "As a chef, I want to set standing orders with my farmers so that sourcing runs on autopilot each week."
+      },
+      {
+        "id": "feat_003",
+        "name": "Consolidated Delivery Routing",
+        "description": "Intelligently aggregates orders across multiple farms and suggests optimal delivery routes and pickup schedules.",
+        "priority": "P1",
+        "user_story": "As a farm, I want delivery routes optimized so that I can serve 10 restaurant clients in one efficient round."
+      },
+      {
+        "id": "feat_004",
+        "name": "Automated Invoicing & ACH Payments",
+        "description": "Order confirmation generates invoice automatically. Restaurant pays via ACH. Farm receives net-15 payout automatically.",
+        "priority": "P0",
+        "user_story": "As a farmer, I want invoices generated automatically so that I never have to chase a restaurant for payment."
+      },
+      {
+        "id": "feat_005",
+        "name": "Traceability & Provenance QR Codes",
+        "description": "Each order generates a QR code linking to farm profile, harvest date, and certifications — shareable on restaurant menus.",
+        "priority": "P1",
+        "user_story": "As a restaurant, I want to show my sourcing story on the menu so that guests understand our farm relationships."
+      },
+      {
+        "id": "feat_006",
+        "name": "Demand Forecasting for Farms",
+        "description": "AI-driven demand signals from restaurant ordering history help farms plan planting and reduce waste.",
+        "priority": "P2",
+        "user_story": "As a farmer, I want planting recommendations based on restaurant demand so that I reduce overplanting waste."
+      }
+    ],
+    "user_journeys": [
+      {
+        "persona": "Chef Isabella — Farm-to-Table Restaurant",
+        "steps": [
+          "Signs up, browses 40 local farms within 50 miles sorted by certification and delivery day",
+          "Sets up standing order: 10lbs heirloom tomatoes from Red Rock Farm, weekly on Tuesdays",
+          "Gets SMS notification: 'Summer squash now available from Blue Sky Farm'",
+          "Orders squash, receives consolidated invoice for all farms each Monday",
+          "Pays single ACH payment covering all four farm orders",
+          "Scans QR code to add farm provenance to digital menu"
+        ],
+        "success_condition": "Restaurant fully migrated from phone-based sourcing to Cultivar within 2 weeks"
+      }
+    ],
+    "tech_stack": {
+      "frontend": "Next.js 14, TypeScript, Tailwind CSS, Mapbox GL JS",
+      "backend": "FastAPI (Python), Celery for scheduling, Redis",
+      "database": "PostgreSQL (Supabase), PostGIS for geospatial queries",
+      "auth": "NextAuth.js (email magic link + Google OAuth)",
+      "hosting": "Vercel (frontend), Railway (backend), Supabase (DB + PostGIS)"
+    },
+    "database_schema": [
+      {
+        "name": "producers",
+        "columns": [
+          {"name": "id", "sql_type": "UUID", "nullable": false, "primary_key": true, "foreign_key": null, "index": true},
+          {"name": "name", "sql_type": "VARCHAR(255)", "nullable": false, "primary_key": false, "foreign_key": null, "index": true},
+          {"name": "location", "sql_type": "GEOMETRY(POINT, 4326)", "nullable": false, "primary_key": false, "foreign_key": null, "index": true},
+          {"name": "stripe_account_id", "sql_type": "VARCHAR(255)", "nullable": true, "primary_key": false, "foreign_key": null, "index": false},
+          {"name": "certifications", "sql_type": "JSONB", "nullable": true, "primary_key": false, "foreign_key": null, "index": false}
+        ],
+        "relationships": []
+      },
+      {
+        "name": "listings",
+        "columns": [
+          {"name": "id", "sql_type": "UUID", "nullable": false, "primary_key": true, "foreign_key": null, "index": true},
+          {"name": "producer_id", "sql_type": "UUID", "nullable": false, "primary_key": false, "foreign_key": "producers.id", "index": true},
+          {"name": "product_name", "sql_type": "VARCHAR(255)", "nullable": false, "primary_key": false, "foreign_key": null, "index": false},
+          {"name": "price_per_unit_cents", "sql_type": "INTEGER", "nullable": false, "primary_key": false, "foreign_key": null, "index": false},
+          {"name": "available_quantity", "sql_type": "DECIMAL(10,2)", "nullable": false, "primary_key": false, "foreign_key": null, "index": false},
+          {"name": "available_until", "sql_type": "TIMESTAMPTZ", "nullable": false, "primary_key": false, "foreign_key": null, "index": true}
+        ],
+        "relationships": ["listings.producer_id -> producers.id"]
+      },
+      {
+        "name": "orders",
+        "columns": [
+          {"name": "id", "sql_type": "UUID", "nullable": false, "primary_key": true, "foreign_key": null, "index": true},
+          {"name": "restaurant_id", "sql_type": "UUID", "nullable": false, "primary_key": false, "foreign_key": "restaurants.id", "index": true},
+          {"name": "producer_id", "sql_type": "UUID", "nullable": false, "primary_key": false, "foreign_key": "producers.id", "index": true},
+          {"name": "status", "sql_type": "VARCHAR(30)", "nullable": false, "primary_key": false, "foreign_key": null, "index": true},
+          {"name": "delivery_date", "sql_type": "TIMESTAMPTZ", "nullable": false, "primary_key": false, "foreign_key": null, "index": true},
+          {"name": "total_cents", "sql_type": "INTEGER", "nullable": false, "primary_key": false, "foreign_key": null, "index": false}
+        ],
+        "relationships": ["orders.restaurant_id -> restaurants.id", "orders.producer_id -> producers.id"]
+      }
+    ],
+    "api_endpoints": [
+      {"method": "GET", "path": "/api/producers/nearby", "description": "Find farms within radius with available listings this week", "auth_required": true, "request_schema": {"lat": "float", "lng": "float", "radius_km": "integer"}, "response_schema": {"producers": "array"}},
+      {"method": "POST", "path": "/api/orders", "description": "Place order with a producer — creates invoice automatically", "auth_required": true, "request_schema": {"producer_id": "uuid", "items": "array", "delivery_date": "date"}, "response_schema": {"order_id": "uuid", "invoice_url": "string"}},
+      {"method": "POST", "path": "/api/listings", "description": "Farm publishes new weekly availability", "auth_required": true, "request_schema": {"product_name": "string", "quantity": "float", "price_cents": "integer"}, "response_schema": {"listing_id": "uuid"}},
+      {"method": "GET", "path": "/api/orders/{id}/traceability", "description": "Get QR code and provenance data for an order", "auth_required": false, "request_schema": null, "response_schema": {"farm_name": "string", "harvest_date": "date", "certifications": "array", "qr_url": "string"}},
+      {"method": "POST", "path": "/api/standing-orders", "description": "Configure a recurring weekly order with a producer", "auth_required": true, "request_schema": {"producer_id": "uuid", "items": "array", "day_of_week": "integer"}, "response_schema": {"standing_order_id": "uuid"}},
+      {"method": "POST", "path": "/api/webhooks/stripe", "description": "Stripe Connect payout confirmation webhook", "auth_required": false, "request_schema": null, "response_schema": null}
+    ],
+    "pricing_tiers": [
+      {"name": "Farmer Free", "price_monthly_usd": 0.0, "price_annual_usd": 0.0, "features": ["List up to 20 products", "Up to 5 restaurant clients", "Basic invoicing", "8% marketplace commission", "Email support"], "target_segment": "Small farms testing digital selling"},
+      {"name": "Producer Pro", "price_monthly_usd": 49.0, "price_annual_usd": 470.4, "features": ["Unlimited listings & clients", "5% commission (vs 8%)", "Demand forecasting", "Route optimization", "Priority listing placement", "SMS notifications"], "target_segment": "Established farms with 10+ restaurant clients"},
+      {"name": "Restaurant Hub", "price_monthly_usd": 89.0, "price_annual_usd": 854.4, "features": ["Unlimited farm sourcing", "Standing orders & subscriptions", "Consolidated invoicing", "Provenance QR codes", "Sourcing analytics", "Menu integration API"], "target_segment": "Restaurants spending $10K+/month on local sourcing"}
+    ],
+    "revenue_model": "Dual-sided marketplace with farm-side commission (5-8%) on all transactions + restaurant subscription ($89/mo). At 500 farms doing $200K average annual GMV: $5M GMV × 6% = $300K commission ARR. Plus 200 restaurant subscribers × $89/mo = $213K ARR. Total: $513K ARR at early scale.",
+    "go_to_market": "Partner with 3 regional food hubs and 2 farmer's market networks as distribution channels. Launch in 2 metro areas: Portland (strong farm-to-table scene) and Austin. Onboard 50 farms with a 6-month commission-free launch incentive. Target chef influencers on Instagram for restaurant-side acquisition.",
+    "compliance_requirements": ["FDA Food Safety Modernization Act (FSMA) traceability rules", "USDA Organic certification verification", "PCI-DSS SAQ-A (Stripe Connect)", "State-level food broker licensing", "GDPR for any EU producers or buyers"],
+    "known_risks": [
+      "Two-sided marketplace chicken-and-egg problem — restaurants won't join without farms, farms won't join without restaurants",
+      "Seasonal supply variability makes standing orders difficult to fulfill reliably, generating chargebacks",
+      "Local food logistics is extremely fragmented — building reliable delivery infrastructure is expensive",
+      "Sysco and US Foods could add 'local sourcing' marketplace features to their existing restaurant relationships"
+    ],
+    "amendments": [],
+    "version": 1
+  },
+  "generated_files": {
+    "frontend/app/page.tsx": "// Cultivar landing page — generated by PROMETHEUS",
+    "backend/main.py": "# Cultivar FastAPI backend — generated by PROMETHEUS",
+    "migrations/001_create_tables.sql": "-- Cultivar schema with PostGIS — generated by PROMETHEUS",
+    "README.md": "# Cultivar\n\nFarm-to-table, automated."
+  },
+  "kill_reports": [
+    {
+      "id": "kr-b001",
+      "critic_type": "BUSINESS",
+      "severity": "CRITICAL",
+      "title": "Classic Marketplace Cold Start — Which Side Do You Onboard First?",
+      "description": "Two-sided marketplaces require simultaneous supply and demand. Farms won't pay $49/mo or list their inventory without restaurant buyers. Restaurants won't subscribe without sufficient farm supply. The current GTM says 'launch in Portland and Austin' but has no explicit answer to who gets onboarded first and how the chicken-and-egg is resolved. GrubHub, Airbnb, and DoorDash all failed in multiple cities before finding the right supply-first sequencing playbook.",
+      "affected_layer": "BUSINESS_MODEL",
+      "kill_potential": 10,
+      "suggested_fix": "Supply-first: onboard 30 farms in city 1 before opening restaurant sign-ups. Give farms 6 months zero-commission to guarantee committed supply. Launch a weekly 'local sourcing box' as a restaurant trial to generate demand without subscription commitment. Mirror Faire.com's 'pay after you sell' model for farms.",
+      "status": "PATCHED",
+      "patch_description": "Restructured launch strategy to supply-first sequencing: onboard 30 farms in Portland at 0% commission for 6 months, gate restaurant access to invite-only until farm supply is critical mass, and launched a zero-commitment weekly 'Cultivar Box' for restaurants to trial before subscribing.",
+      "challenge_argument": null,
+      "arbiter_verdict": null
+    },
+    {
+      "id": "kr-s001",
+      "critic_type": "SECURITY",
+      "severity": "HIGH",
+      "title": "Stripe Connect Payout Delay Creates Farmer Cash Flow Cliff",
+      "description": "Stripe Connect Standard accounts have a 7-day rolling payout schedule by default. For a small farm with $15,000/month in orders, a 7-day delay represents $3,500 in float at any time. During peak season (July-August), this delay could prevent a farm from paying fuel costs for delivery vehicles. This is a hidden product trust issue — farms will leave for competitors (or Venmo) when they can't access their earnings.",
+      "affected_layer": "ARCHITECTURE",
+      "kill_potential": 7,
+      "suggested_fix": "Negotiate Stripe Connect instant payout access (1% fee for farms needing same-day payouts). Build a 'pay on delivery confirmation' feature so farms receive funds within 24 hours of confirmed delivery, not net-15.",
+      "status": "PATCHED",
+      "patch_description": "Integrated Stripe Connect Instant Payouts with 1% fee option for farms needing same-day access, added a 'Delivery Confirmed' webhook that triggers immediate payout initiation, and built a payout schedule transparency dashboard in the farm portal.",
+      "challenge_argument": null,
+      "arbiter_verdict": null
+    },
+    {
+      "id": "kr-p001",
+      "critic_type": "PRODUCT",
+      "severity": "HIGH",
+      "title": "No Substitution Handling — Standing Orders Will Break Weekly",
+      "description": "Seasonal agriculture makes standing orders inherently unstable. A chef's standing order for 10lbs heirloom tomatoes will fail 30-40% of weeks due to weather, pest damage, or harvest timing. The current spec has no substitution mechanism — the order simply fails. A restaurant that gets 3 failed deliveries will churn immediately. Good Eggs (failed) and Local Crate (acquired) both cited fulfillment reliability as their #1 churn driver.",
+      "affected_layer": "SPEC",
+      "kill_potential": 8,
+      "suggested_fix": "Build a 'Substitution Preferences' system: farm can offer alternatives (e.g. 'we have cherry tomatoes instead'), restaurant pre-approves substitution categories. Auto-approve within tolerance (same product family, within 20% price). Notify chef of any substitution before delivery.",
+      "status": "PATCHED",
+      "patch_description": "Built a Substitution Preferences engine: farms flag shortfalls 48 hours before delivery with suggested alternatives, restaurants pre-configure auto-approve rules by product category and price tolerance, and a push notification alerts the chef of any substitution for final approval.",
+      "challenge_argument": null,
+      "arbiter_verdict": null
+    },
+    {
+      "id": "kr-c001",
+      "critic_type": "COMPLIANCE",
+      "severity": "HIGH",
+      "title": "FSMA Traceability Rule — No Lot-Level Tracking",
+      "description": "FDA FSMA Section 204 (effective January 2026) requires all 'high-risk foods' (leafy greens, tomatoes, peppers, melons) to have lot-level traceability from farm to fork. Restaurants purchasing through Cultivar must be able to produce a full supply chain traceability report within 24 hours of an FDA request. The current QR code is marketing-grade, not compliance-grade — it lacks lot codes, harvest dates by field, and pack date records.",
+      "affected_layer": "COMPLIANCE",
+      "kill_potential": 9,
+      "suggested_fix": "Add lot code and harvest field ID fields to listing creation. Store FSMA-required Key Data Elements (KDEs) for Critical Tracking Events (CTEs): harvesting, cooling, packing, shipping. Build a one-click FDA traceability report generator for restaurants.",
+      "status": "PATCHED",
+      "patch_description": "Implemented FSMA Section 204 compliance layer: mandatory lot code and field ID capture in listing creation, full Key Data Element (KDE) storage for all Critical Tracking Events (CTEs), and a one-click FDA 24-hour traceability report generator for restaurant buyers.",
+      "challenge_argument": null,
+      "arbiter_verdict": null
+    },
+    {
+      "id": "kr-sc001",
+      "critic_type": "SCALABILITY",
+      "severity": "MEDIUM",
+      "title": "PostGIS Geospatial Query Unindexed at Scale",
+      "description": "The 'nearby farms' query using PostGIS ST_DWithin will perform a full table scan without a proper GIST index on the location column. At 10,000 farm listings, each restaurant page load triggers a geospatial query taking 500-2000ms. This is acceptable with 10 farms but degrades catastrophically at 1,000+ farms in a metro area.",
+      "affected_layer": "ARCHITECTURE",
+      "kill_potential": 5,
+      "suggested_fix": "Add GIST index on producers.location. Use ST_DWithin with a bounding box pre-filter. Cache radius query results in Redis with 15-minute TTL keyed by (lat, lng, radius) rounded to nearest 0.1 degree. Add EXPLAIN ANALYZE to CI pipeline to catch query regressions.",
+      "status": "PATCHED",
+      "patch_description": "Added GIST spatial index on producers.location, implemented Redis caching of nearby-farm query results with 15-minute TTL and grid-snapped cache keys, and added PostGIS EXPLAIN ANALYZE assertions to the CI test suite to catch future query regressions.",
+      "challenge_argument": null,
+      "arbiter_verdict": null
+    },
+    {
+      "id": "kr-b002",
+      "critic_type": "BUSINESS",
+      "severity": "LOW",
+      "title": "Seasonal Revenue Concentration — 60% GMV in Summer",
+      "description": "Local food production is highly seasonal. Expect 60-70% of GMV to occur May-October. Revenue from November-April will be dramatically lower, creating cash flow issues for team salaries and infrastructure costs during winter months.",
+      "affected_layer": "BUSINESS_MODEL",
+      "kill_potential": 4,
+      "suggested_fix": "Partner with greenhouse farms and year-round indoor vertical farms (mushrooms, herbs, microgreens) to maintain winter GMV. Launch a 'winter sourcing' program for preserved goods, pickles, and dry goods. Offer subscription-discounted rates to restaurant buyers who commit to year-round purchasing.",
+      "status": "CHALLENGED",
+      "patch_description": null,
+      "challenge_argument": "Seasonal cash flow concentration is a feature of this market, not a flaw unique to Cultivar. Every food distributor, farm co-op, and regional food hub in America operates on this model and has survived for decades. We can model this in our burn rate projections and maintain 9-month runway through the winter operating period using summer-generated cash reserves. Farmers Markets generate 80% of annual revenue in the same 6-month window and have operated sustainably for 40+ years. This is manageable operational planning, not a business model flaw.",
+      "arbiter_verdict": "ACCEPTED"
+    }
+  ],
+  "combat_log": [
+    {"timestamp": "06:10:01", "agent": "SYSTEM", "message": "Mission created. Initiating Prometheus pipeline.", "level": "INFO"},
+    {"timestamp": "06:10:03", "agent": "BUILDER", "message": "Calling Gemini 2.0 Flash to generate company blueprint...", "level": "INFO"},
+    {"timestamp": "06:10:14", "agent": "BUILDER", "message": "Contract parsed: Cultivar — Farm-to-table, automated. Direct sourcing for serious kitchens.", "level": "SUCCESS"},
+    {"timestamp": "06:10:15", "agent": "BUILDER", "message": "Launching build agents sequentially: Frontend → Backend → Database → Docs", "level": "INFO"},
+    {"timestamp": "06:10:32", "agent": "BUILDER", "message": "Sub-agent FRONTEND complete: 8 files generated", "level": "SUCCESS"},
+    {"timestamp": "06:10:49", "agent": "BUILDER", "message": "Sub-agent BACKEND complete: 6 files generated", "level": "SUCCESS"},
+    {"timestamp": "06:10:58", "agent": "BUILDER", "message": "Sub-agent DATABASE complete: 2 files generated", "level": "SUCCESS"},
+    {"timestamp": "06:11:07", "agent": "BUILDER", "message": "Sub-agent DOCS complete: 3 files generated", "level": "SUCCESS"},
+    {"timestamp": "06:11:08", "agent": "SYSTEM", "message": "All 5 critic agents deployed simultaneously.", "level": "WARNING"},
+    {"timestamp": "06:11:17", "agent": "THE INVESTOR", "message": "[CRITICAL] Classic Marketplace Cold Start — Which Side Do You Onboard First?", "level": "WARNING"},
+    {"timestamp": "06:11:19", "agent": "THE HACKER", "message": "[HIGH] Stripe Connect Payout Delay Creates Farmer Cash Flow Cliff", "level": "WARNING"},
+    {"timestamp": "06:11:21", "agent": "THE SKEPTIC", "message": "[HIGH] No Substitution Handling — Standing Orders Will Break Weekly", "level": "WARNING"},
+    {"timestamp": "06:11:23", "agent": "THE LAWYER", "message": "[HIGH] FSMA Traceability Rule — No Lot-Level Tracking", "level": "WARNING"},
+    {"timestamp": "06:11:25", "agent": "THE ARCHITECT", "message": "[MEDIUM] PostGIS Geospatial Query Unindexed at Scale", "level": "WARNING"},
+    {"timestamp": "06:11:26", "agent": "THE INVESTOR", "message": "[LOW] Seasonal Revenue Concentration — 60% GMV in Summer", "level": "WARNING"},
+    {"timestamp": "06:11:27", "agent": "SYSTEM", "message": "Attack complete: 6 vulnerabilities found. CRITICAL:1 | HIGH:3 | MEDIUM:1 | LOW:1. Survival: 55%", "level": "CRITICAL"},
+    {"timestamp": "06:11:28", "agent": "DEFENDER", "message": "Defense loop initiated. Processing 6 open threats...", "level": "INFO"},
+    {"timestamp": "06:11:31", "agent": "DEFENDER", "message": "PATCHED [CRITICAL] Classic Marketplace Cold Start", "level": "SUCCESS"},
+    {"timestamp": "06:11:34", "agent": "DEFENDER", "message": "PATCHED [HIGH] Stripe Connect Payout Delay Creates Farmer Cash Flow Cliff", "level": "SUCCESS"},
+    {"timestamp": "06:11:37", "agent": "DEFENDER", "message": "PATCHED [HIGH] No Substitution Handling — Standing Orders Will Break Weekly", "level": "SUCCESS"},
+    {"timestamp": "06:11:40", "agent": "DEFENDER", "message": "PATCHED [HIGH] FSMA Traceability Rule — No Lot-Level Tracking", "level": "SUCCESS"},
+    {"timestamp": "06:11:43", "agent": "DEFENDER", "message": "PATCHED [MEDIUM] PostGIS Geospatial Query Unindexed at Scale", "level": "SUCCESS"},
+    {"timestamp": "06:11:44", "agent": "DEFENDER", "message": "Challenging low-threat report: Seasonal Revenue Concentration", "level": "INFO"},
+    {"timestamp": "06:11:46", "agent": "ARBITER", "message": "DISMISSED: Seasonal Revenue — Founder's argument cites valid operational precedents.", "level": "INFO"},
+    {"timestamp": "06:11:47", "agent": "DEFENDER", "message": "Defense complete. Final survival: 100%", "level": "SUCCESS"},
+    {"timestamp": "06:11:48", "agent": "SYSTEM", "message": "MISSION COMPLETE — DEPLOYED: https://prometheus-preview.fly.dev/preview/demo-foodmkt-003", "level": "SUCCESS"}
+  ]
+}

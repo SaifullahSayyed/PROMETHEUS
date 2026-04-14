@@ -144,10 +144,20 @@
 .examplesLabel {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--cod-steel-dim);
+  color: var(--cod-green);
   letter-spacing: 2px;
   display: block;
   margin-bottom: 12px;
+}
+
+.examplesSubLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--cod-steel-dim);
+  letter-spacing: 1px;
+  display: block;
+  margin-top: 12px;
+  text-align: center;
 }
 
 .examplePills {
@@ -157,22 +167,39 @@
 }
 
 .examplePill {
-  background: transparent;
-  border: 1px solid var(--cod-border);
-  color: var(--cod-steel);
+  background: rgba(74, 255, 145, 0.04);
+  border: 1px solid rgba(74, 255, 145, 0.2);
+  color: var(--cod-green);
   font-family: var(--font-mono);
   font-size: 11px;
-  padding: 10px 16px;
+  padding: 12px 16px;
   cursor: pointer;
   text-align: left;
   transition: all 0.2s;
   letter-spacing: 0.5px;
 }
 
-.examplePill:hover {
+.examplePill:hover:not(:disabled) {
   border-color: var(--cod-green);
-  color: var(--cod-green);
-  background: rgba(74, 255, 145, 0.05);
+  background: rgba(74, 255, 145, 0.1);
+  box-shadow: 0 0 20px rgba(74, 255, 145, 0.15);
+}
+
+.examplePill:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.examplePillLoading {
+  border-color: var(--cod-amber) !important;
+  color: var(--cod-amber) !important;
+  background: rgba(255, 168, 0, 0.07) !important;
+  animation: loadingPulse 0.8s ease-in-out infinite;
+}
+
+@keyframes loadingPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 .inputGroup {

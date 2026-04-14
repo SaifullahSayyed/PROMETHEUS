@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 load_dotenv(override=True)
 from models.mission import Mission
-from graph import run_pipeline, get_mission, store_mission, get_queue, emit, _missions
+from graph import run_pipeline, get_mission, store_mission, get_queue, emit, _missions, DEMO_MODE, DEMO_IDS
 app = FastAPI(title="Prometheus API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
@@ -34,6 +34,15 @@ async def create_mission(request: CreateMissionRequest, background_tasks: Backgr
     get_queue(mission.id)
     background_tasks.add_task(run_pipeline, mission.id)
     return {"mission_id": mission.id, "status": "PENDING"}
+@app.post("/api/demo/{demo_index}")
+async def launch_demo(demo_index: int, background_tasks: BackgroundTasks):
+    demo_ids = list(DEMO_IDS.keys())
+    if demo_index < 0 or demo_index >= len(demo_ids):
+        raise HTTPException(status_code=404, detail="Demo not found")
+    mission_id = demo_ids[demo_index]
+    get_queue(mission_id)
+    background_tasks.add_task(run_pipeline, mission_id)
+    return {"mission_id": mission_id, "status": "PENDING", "demo": True}
 @app.get("/api/missions/{mission_id}/stream")
 async def stream_mission(mission_id: str):
     mission = get_mission(mission_id)
@@ -264,6 +273,7 @@ async def health():
     return {
         "status": "operational",
         "version": "1.0.0",
+        "demo_mode": DEMO_MODE,
         "active_missions": len(_missions)
     }
 if __name__ == "__main__":

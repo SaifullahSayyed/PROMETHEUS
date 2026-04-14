@@ -1,0 +1,267 @@
+{
+  "id": "demo-freelancer-002",
+  "created_at": "2026-04-14T06:05:00",
+  "input_prompt": "A freelance invoicing tool with time tracking and automated payment reminders via email and SMS",
+  "status": "DEPLOYED",
+  "current_phase": "DEPLOYED",
+  "survival_score": 100.0,
+  "deploy_url": "https://prometheus-preview.fly.dev/preview/demo-freelancer-002",
+  "error": null,
+  "contract": {
+    "company_name": "Billdr",
+    "tagline": "Invoice instantly. Get paid automatically. Never chase again.",
+    "problem_statement": "Freelancers spend an average of 8 hours per month chasing overdue invoices, and 29% of invoices are paid late, costing U.S. freelancers $50B in delayed cash flow annually. Tools like QuickBooks are too complex and priced for businesses, while Wave and PayPal invoices lack automated follow-up sequences and integrated time tracking.",
+    "target_users": [
+      "Independent freelancers billing 3-15 clients monthly earning $5K-$20K/month",
+      "Boutique agencies with 2-8 staff managing 20-50 active projects",
+      "Fractional executives and consultants billing hourly or on retainer",
+      "Creative professionals — designers, writers, videographers — with irregular billing"
+    ],
+    "core_features": [
+      {
+        "id": "feat_001",
+        "name": "One-Click Invoice Generation",
+        "description": "Generate professional branded invoices from tracked time in under 10 seconds. Auto-populate client data, rate, and hours.",
+        "priority": "P0",
+        "user_story": "As a freelancer, I want to convert my time log to an invoice in one click so that billing takes seconds, not an hour."
+      },
+      {
+        "id": "feat_002",
+        "name": "Automated Payment Chase Sequences",
+        "description": "Smart reminder sequences: email at due date, SMS at +3 days, final notice at +7 days. Stops automatically on payment.",
+        "priority": "P0",
+        "user_story": "As a freelancer, I want reminders sent automatically so that I never have to awkwardly chase a client again."
+      },
+      {
+        "id": "feat_003",
+        "name": "Integrated Time Tracker",
+        "description": "Browser-based and mobile timer with project tagging, billable/non-billable toggle, and detailed time reports.",
+        "priority": "P0",
+        "user_story": "As a consultant, I want to track time by project so that I can bill accurately and justify my hours to clients."
+      },
+      {
+        "id": "feat_004",
+        "name": "Stripe & ACH Payments",
+        "description": "Clients pay directly from the invoice link via credit card or ACH bank transfer. Funds deposited in 1-2 days.",
+        "priority": "P0",
+        "user_story": "As a freelancer, I want clients to pay right from the invoice so that collection requires zero friction."
+      },
+      {
+        "id": "feat_005",
+        "name": "Client Portal",
+        "description": "Password-free client portal where clients view all invoices, download PDFs, and manage payment methods.",
+        "priority": "P1",
+        "user_story": "As a client, I want a self-service portal so that I can find invoices without emailing my freelancer."
+      },
+      {
+        "id": "feat_006",
+        "name": "Revenue Analytics Dashboard",
+        "description": "Monthly revenue charts, average payment time per client, overdue invoice heatmap, and projected monthly income.",
+        "priority": "P2",
+        "user_story": "As a freelancer, I want income visibility so that I can plan my finances month to month."
+      }
+    ],
+    "user_journeys": [
+      {
+        "persona": "Freelance Designer — Marcus",
+        "steps": [
+          "Signs up with email in 30 seconds, no credit card required",
+          "Connects Stripe account in 2 minutes",
+          "Starts time tracker on first client project",
+          "Stops timer after 4.5 hours and clicks 'Create Invoice' — auto-populated",
+          "Sends invoice; client pays via card link in 24 hours",
+          "Receives Slack notification: Payment received — $675.00"
+        ],
+        "success_condition": "First invoice paid within 48 hours of signup with zero manual follow-up"
+      }
+    ],
+    "tech_stack": {
+      "frontend": "Next.js 14, TypeScript, Tailwind CSS",
+      "backend": "FastAPI (Python), Celery + Redis for reminders",
+      "database": "PostgreSQL (Supabase)",
+      "auth": "NextAuth.js (magic link email + Google OAuth)",
+      "hosting": "Vercel (frontend), Railway (backend + Celery)"
+    },
+    "database_schema": [
+      {
+        "name": "users",
+        "columns": [
+          {"name": "id", "sql_type": "UUID", "nullable": false, "primary_key": true, "foreign_key": null, "index": true},
+          {"name": "email", "sql_type": "VARCHAR(255)", "nullable": false, "primary_key": false, "foreign_key": null, "index": true},
+          {"name": "stripe_account_id", "sql_type": "VARCHAR(255)", "nullable": true, "primary_key": false, "foreign_key": null, "index": false},
+          {"name": "hourly_rate_cents", "sql_type": "INTEGER", "nullable": true, "primary_key": false, "foreign_key": null, "index": false}
+        ],
+        "relationships": []
+      },
+      {
+        "name": "invoices",
+        "columns": [
+          {"name": "id", "sql_type": "UUID", "nullable": false, "primary_key": true, "foreign_key": null, "index": true},
+          {"name": "user_id", "sql_type": "UUID", "nullable": false, "primary_key": false, "foreign_key": "users.id", "index": true},
+          {"name": "client_email", "sql_type": "VARCHAR(255)", "nullable": false, "primary_key": false, "foreign_key": null, "index": false},
+          {"name": "amount_cents", "sql_type": "INTEGER", "nullable": false, "primary_key": false, "foreign_key": null, "index": false},
+          {"name": "status", "sql_type": "VARCHAR(20)", "nullable": false, "primary_key": false, "foreign_key": null, "index": true},
+          {"name": "due_date", "sql_type": "TIMESTAMPTZ", "nullable": false, "primary_key": false, "foreign_key": null, "index": true}
+        ],
+        "relationships": ["invoices.user_id -> users.id"]
+      },
+      {
+        "name": "time_entries",
+        "columns": [
+          {"name": "id", "sql_type": "UUID", "nullable": false, "primary_key": true, "foreign_key": null, "index": true},
+          {"name": "user_id", "sql_type": "UUID", "nullable": false, "primary_key": false, "foreign_key": "users.id", "index": true},
+          {"name": "invoice_id", "sql_type": "UUID", "nullable": true, "primary_key": false, "foreign_key": "invoices.id", "index": false},
+          {"name": "duration_seconds", "sql_type": "INTEGER", "nullable": false, "primary_key": false, "foreign_key": null, "index": false},
+          {"name": "description", "sql_type": "TEXT", "nullable": true, "primary_key": false, "foreign_key": null, "index": false}
+        ],
+        "relationships": ["time_entries.user_id -> users.id", "time_entries.invoice_id -> invoices.id"]
+      }
+    ],
+    "api_endpoints": [
+      {"method": "POST", "path": "/api/invoices", "description": "Create new invoice, optionally from time entries", "auth_required": true, "request_schema": {"client_email": "string", "line_items": "array", "due_date": "date"}, "response_schema": {"id": "uuid", "payment_link": "string"}},
+      {"method": "GET", "path": "/api/invoices", "description": "List all invoices with status and aging", "auth_required": true, "request_schema": null, "response_schema": {"invoices": "array", "total_overdue_cents": "integer"}},
+      {"method": "POST", "path": "/api/time-entries", "description": "Log or stop a time entry", "auth_required": true, "request_schema": {"action": "start|stop", "description": "string"}, "response_schema": {"id": "uuid", "duration_seconds": "integer"}},
+      {"method": "POST", "path": "/api/invoices/{id}/remind", "description": "Manually trigger reminder sequence", "auth_required": true, "request_schema": null, "response_schema": {"sent": "boolean"}},
+      {"method": "POST", "path": "/api/webhooks/stripe", "description": "Stripe payment confirmation webhook", "auth_required": false, "request_schema": null, "response_schema": null},
+      {"method": "GET", "path": "/api/analytics/revenue", "description": "Monthly revenue summary and client payment timing stats", "auth_required": true, "request_schema": null, "response_schema": {"monthly_revenue": "array", "avg_days_to_pay": "float"}}
+    ],
+    "pricing_tiers": [
+      {"name": "Solo", "price_monthly_usd": 0.0, "price_annual_usd": 0.0, "features": ["3 clients", "5 invoices/month", "Basic time tracking", "Payment via Stripe (1.5% platform fee)", "Email reminders"], "target_segment": "Freelancers just starting out"},
+      {"name": "Pro", "price_monthly_usd": 19.0, "price_annual_usd": 182.4, "features": ["Unlimited clients & invoices", "No platform fees", "SMS + email reminders", "Client portal", "ACH payments", "Revenue analytics"], "target_segment": "Active freelancers billing $3K+/month"},
+      {"name": "Agency", "price_monthly_usd": 79.0, "price_annual_usd": 758.4, "features": ["Team time tracking (up to 10 users)", "Multi-client reporting", "Custom invoice branding", "Priority support", "API access", "Zapier integration"], "target_segment": "Boutique agencies with multiple staff"}
+    ],
+    "revenue_model": "Freemium with 1.5% transaction fee on free tier + Pro ($19/mo) and Agency ($79/mo) subscriptions. At 10,000 Pro users: $2.28M ARR. Transaction fee from free tier adds ~$200K ARR additional.",
+    "go_to_market": "SEO-led content marketing targeting 'how to invoice freelance', 'chase invoice email template' (50K+ monthly searches). Partner with Toptal, Fiverr Pro, and Upwork Pro for co-marketing. Chrome extension for time tracking drives daily active usage and virality.",
+    "compliance_requirements": ["PCI-DSS SAQ-A (Stripe Elements only)", "GDPR (EU freelancer clients)", "CCPA (California users)", "CAN-SPAM (automated emails)", "TCPA (SMS reminders must have opt-in)"],
+    "known_risks": [
+      "Stripe charges 2.9% + 30¢ per transaction — after our 1.5% fee, margin on free tier payments is negative at low invoice amounts",
+      "Wave (free) and PayPal are entrenched free alternatives that are good enough for many freelancers",
+      "SMS delivery requires Twilio trust score — new accounts face high delivery failure rates during warmup",
+      "Targeting freelancers means high churn during economic downturns when freelance income drops"
+    ],
+    "amendments": [],
+    "version": 1
+  },
+  "generated_files": {
+    "frontend/app/page.tsx": "// Billdr landing page — generated by PROMETHEUS",
+    "frontend/app/dashboard/page.tsx": "// Billdr dashboard — generated by PROMETHEUS",
+    "backend/main.py": "# Billdr FastAPI backend — generated by PROMETHEUS",
+    "migrations/001_create_tables.sql": "-- Billdr schema — generated by PROMETHEUS",
+    "README.md": "# Billdr\n\nInvoice instantly. Get paid automatically."
+  },
+  "kill_reports": [
+    {
+      "id": "kr-b001",
+      "critic_type": "BUSINESS",
+      "severity": "CRITICAL",
+      "title": "Negative Unit Economics on Free Tier",
+      "description": "Stripe charges 2.9% + $0.30 per transaction. Billing a 1.5% platform fee means at a $100 invoice, Stripe costs $3.20 and you collect $1.50 — a $1.70 loss per transaction. You are literally paying for free users to get paid. Wave, the main competitor, survives this only because their 2.9% processing fee is the revenue, not a cost. At scale, 10,000 free tier invoices at $500 average = $85,000 in Stripe fees vs $75,000 in platform fees collected. Net burn: -$10,000/month.",
+      "affected_layer": "BUSINESS_MODEL",
+      "kill_potential": 9,
+      "suggested_fix": "Raise free tier platform fee to 3.5% (above Stripe cost) or eliminate it and use the free tier purely as a conversion funnel with a hard 5 invoice/month cap to force Pro upgrade. Model after invoice.ninja.",
+      "status": "PATCHED",
+      "patch_description": "Restructured free tier to a hard 5 invoice/month cap with no platform fee, eliminating the negative margin transaction model and converting free tier into a pure upgrade funnel targeting Pro at $19/mo.",
+      "challenge_argument": null,
+      "arbiter_verdict": null
+    },
+    {
+      "id": "kr-s001",
+      "critic_type": "SECURITY",
+      "severity": "HIGH",
+      "title": "SMS Reminder TCPA Violation — No Opt-In Collected",
+      "description": "The Telephone Consumer Protection Act (TCPA) requires explicit written consent before sending automated SMS messages. The current design sends SMS reminders to clients without collecting TCPA-compliant opt-in consent on the invoice. Class action TCPA lawsuits average $500-$1,500 per violation per plaintiff. 100 clients receiving one unsolicited SMS = $150,000 potential exposure.",
+      "affected_layer": "COMPLIANCE",
+      "kill_potential": 8,
+      "suggested_fix": "Add 'Allow SMS reminders' checkbox to invoice creation flow. Store opt-in timestamp, IP, and user agent. Add SMS opt-out via 'Reply STOP' handling. Default all new clients to email-only until explicit SMS consent is given.",
+      "status": "PATCHED",
+      "patch_description": "Added TCPA-compliant SMS consent checkbox to invoice creation, stored consent audit trail with timestamp and IP in a dedicated consent_records table, implemented STOP reply handling via Twilio webhook, and defaulted all clients to email-only notifications.",
+      "challenge_argument": null,
+      "arbiter_verdict": null
+    },
+    {
+      "id": "kr-p001",
+      "critic_type": "PRODUCT",
+      "severity": "HIGH",
+      "title": "No Mobile App — Core Use Case is On-the-Go",
+      "description": "Freelancers start and stop timers between client calls, at coffee shops, and on job sites. A browser-only time tracker means they must remember to log hours retroactively — defeating the entire product promise. Toggl Track, Harvest, and Clockify all have iOS/Android apps as their primary interface. Launching without mobile puts Billdr at a structural disadvantage for the exact use case that creates daily habit.",
+      "affected_layer": "SPEC",
+      "kill_potential": 7,
+      "suggested_fix": "Ship a Progressive Web App (PWA) with offline time tracking on day one. Add a one-tap floating timer widget via the Web Share Target API. Queue time entries locally and sync when back online. Full native apps in v2.",
+      "status": "PATCHED",
+      "patch_description": "Implemented PWA with service worker offline caching for time tracking, one-tap floating timer accessible from the home screen shortcut, and background sync for time entry uploads when connectivity is restored.",
+      "challenge_argument": null,
+      "arbiter_verdict": null
+    },
+    {
+      "id": "kr-c001",
+      "critic_type": "COMPLIANCE",
+      "severity": "MEDIUM",
+      "title": "GDPR: No Data Residency for EU Freelancer Client Data",
+      "description": "Freelancers storing EU client invoices on US-based infrastructure (Railway, Supabase US region) without a Data Processing Agreement violates GDPR Article 44's restrictions on cross-border data transfers. A single EU client complaint to a DPA can trigger a GDPR investigation. Penalties up to 4% global annual revenue or €20M.",
+      "affected_layer": "COMPLIANCE",
+      "kill_potential": 5,
+      "suggested_fix": "Add EU data residency option on signup (Supabase EU region). Generate standard contractual clauses (SCCs) automatically for EU users. Add privacy policy disclosing data processors and transfer mechanisms.",
+      "status": "PATCHED",
+      "patch_description": "Added EU data residency toggle routing EU users to Supabase Frankfurt region, auto-generated Standard Contractual Clauses (SCCs) for EU user onboarding, and updated privacy policy to disclose all subprocessors and transfer mechanisms.",
+      "challenge_argument": null,
+      "arbiter_verdict": null
+    },
+    {
+      "id": "kr-sc001",
+      "critic_type": "SCALABILITY",
+      "severity": "MEDIUM",
+      "title": "Celery Reminder Jobs Have No Idempotency — Duplicate SMS Risk",
+      "description": "If the Celery worker crashes mid-execution and retries, the reminder task will resend the same SMS/email. Clients receiving 3 identical 'Your invoice is overdue' emails in 10 minutes will mark the domain as spam, destroying email deliverability and triggering client complaints. Twilio has no built-in deduplication for SMS sends.",
+      "affected_layer": "ARCHITECTURE",
+      "kill_potential": 5,
+      "suggested_fix": "Add idempotency keys to every reminder task stored in Redis with 24-hour TTL. Check key existence before sending. Add Celery task deduplication middleware. Store reminder_sent_at timestamp on invoice and check before every dispatch.",
+      "status": "PATCHED",
+      "patch_description": "Implemented idempotency keys for all reminder Celery tasks stored in Redis with 24-hour TTL, added pre-send duplicate check querying the reminder_log table, and configured Celery max_retries=1 with exponential backoff on reminder tasks.",
+      "challenge_argument": null,
+      "arbiter_verdict": null
+    },
+    {
+      "id": "kr-b002",
+      "critic_type": "BUSINESS",
+      "severity": "LOW",
+      "title": "Low Switching Cost Means Constant Threat from Wave/QuickBooks",
+      "description": "Freelancer financial tools have near-zero switching costs. A freelancer can export invoices from Billdr, import to Wave (free), and cancel in under 30 minutes. Without a data moat or deep integrations, the product is only as sticky as the UX — and free competitors exist.",
+      "affected_layer": "BUSINESS_MODEL",
+      "kill_potential": 3,
+      "suggested_fix": "Build switching costs through: (1) client relationship data that clients come to rely on their portal, (2) historical time tracking data and reports that are valuable and non-exportable in Wave, (3) deep calendar and Notion integrations that make Billdr the central work hub.",
+      "status": "CHALLENGED",
+      "patch_description": null,
+      "challenge_argument": "Wave has been 'free forever' since 2010 and has 4 million users — yet Harvest ($12/mo), FreshBooks ($19/mo), and invoice.ninja Pro all have thriving paid userbases of 200K+ each. Freelancers demonstrably pay for superior UX and time savings over free alternatives. Our PWA time tracker, one-click invoicing, and automated chase sequences create daily habit loops that Wave's clunky web-only UI cannot match. The real moat is earned through product quality, not feature gating.",
+      "arbiter_verdict": "ACCEPTED"
+    }
+  ],
+  "combat_log": [
+    {"timestamp": "06:05:01", "agent": "SYSTEM", "message": "Mission created. Initiating Prometheus pipeline.", "level": "INFO"},
+    {"timestamp": "06:05:02", "agent": "BUILDER", "message": "Analyzing problem statement...", "level": "INFO"},
+    {"timestamp": "06:05:04", "agent": "BUILDER", "message": "Calling Gemini 2.0 Flash to generate company blueprint...", "level": "INFO"},
+    {"timestamp": "06:05:13", "agent": "BUILDER", "message": "Contract parsed: Billdr — Invoice instantly. Get paid automatically. Never chase again.", "level": "SUCCESS"},
+    {"timestamp": "06:05:14", "agent": "BUILDER", "message": "Launching build agents sequentially: Frontend → Backend → Database → Docs", "level": "INFO"},
+    {"timestamp": "06:05:30", "agent": "BUILDER", "message": "Sub-agent FRONTEND complete: 8 files generated", "level": "SUCCESS"},
+    {"timestamp": "06:05:46", "agent": "BUILDER", "message": "Sub-agent BACKEND complete: 6 files generated", "level": "SUCCESS"},
+    {"timestamp": "06:05:55", "agent": "BUILDER", "message": "Sub-agent DATABASE complete: 2 files generated", "level": "SUCCESS"},
+    {"timestamp": "06:06:04", "agent": "BUILDER", "message": "Sub-agent DOCS complete: 3 files generated", "level": "SUCCESS"},
+    {"timestamp": "06:06:05", "agent": "SYSTEM", "message": "All 5 critic agents deployed simultaneously.", "level": "WARNING"},
+    {"timestamp": "06:06:12", "agent": "THE INVESTOR", "message": "[CRITICAL] Negative Unit Economics on Free Tier", "level": "WARNING"},
+    {"timestamp": "06:06:14", "agent": "THE HACKER", "message": "[HIGH] SMS Reminder TCPA Violation — No Opt-In Collected", "level": "WARNING"},
+    {"timestamp": "06:06:16", "agent": "THE SKEPTIC", "message": "[HIGH] No Mobile App — Core Use Case is On-the-Go", "level": "WARNING"},
+    {"timestamp": "06:06:18", "agent": "THE LAWYER", "message": "[MEDIUM] GDPR: No Data Residency for EU Freelancer Client Data", "level": "WARNING"},
+    {"timestamp": "06:06:20", "agent": "THE ARCHITECT", "message": "[MEDIUM] Celery Reminder Jobs Have No Idempotency — Duplicate SMS Risk", "level": "WARNING"},
+    {"timestamp": "06:06:21", "agent": "THE INVESTOR", "message": "[LOW] Low Switching Cost Means Constant Threat from Wave/QuickBooks", "level": "WARNING"},
+    {"timestamp": "06:06:22", "agent": "SYSTEM", "message": "Attack complete: 6 vulnerabilities found. CRITICAL:1 | HIGH:2 | MEDIUM:2 | LOW:1. Survival: 63%", "level": "CRITICAL"},
+    {"timestamp": "06:06:23", "agent": "DEFENDER", "message": "Defense loop initiated. Processing 6 open threats...", "level": "INFO"},
+    {"timestamp": "06:06:25", "agent": "DEFENDER", "message": "PATCHED [CRITICAL] Negative Unit Economics on Free Tier", "level": "SUCCESS"},
+    {"timestamp": "06:06:27", "agent": "DEFENDER", "message": "PATCHED [HIGH] SMS Reminder TCPA Violation — No Opt-In Collected", "level": "SUCCESS"},
+    {"timestamp": "06:06:30", "agent": "DEFENDER", "message": "PATCHED [HIGH] No Mobile App — Core Use Case is On-the-Go", "level": "SUCCESS"},
+    {"timestamp": "06:06:33", "agent": "DEFENDER", "message": "PATCHED [MEDIUM] GDPR: No Data Residency for EU Freelancer Client Data", "level": "SUCCESS"},
+    {"timestamp": "06:06:36", "agent": "DEFENDER", "message": "PATCHED [MEDIUM] Celery Reminder Jobs Have No Idempotency — Duplicate SMS Risk", "level": "SUCCESS"},
+    {"timestamp": "06:06:37", "agent": "DEFENDER", "message": "Challenging low-threat report: Low Switching Cost Means Constant Threat...", "level": "INFO"},
+    {"timestamp": "06:06:39", "agent": "ARBITER", "message": "DISMISSED: Low Switching Cost — Counter-argument cites compelling market precedents.", "level": "INFO"},
+    {"timestamp": "06:06:40", "agent": "DEFENDER", "message": "Defense complete. Final survival: 100%", "level": "SUCCESS"},
+    {"timestamp": "06:06:41", "agent": "SYSTEM", "message": "MISSION COMPLETE — DEPLOYED: https://prometheus-preview.fly.dev/preview/demo-freelancer-002", "level": "SUCCESS"}
+  ]
+}

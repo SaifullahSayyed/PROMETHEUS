@@ -11,9 +11,18 @@ const BOOT_SEQUENCE = [
 ]
 
 const EXAMPLE_MISSIONS = [
-  'A platform for campus clubs to manage events, recruit members, and collect dues online',
-  'A freelance invoicing tool with time tracking and automated payment reminders via email and SMS',
-  'A marketplace for local food producers to sell directly to restaurants with order management',
+  {
+    label: 'Campus club management platform with event tracking and dues collection',
+    demoIndex: 0,
+  },
+  {
+    label: 'Freelance invoicing tool with time tracking and automated payment reminders',
+    demoIndex: 1,
+  },
+  {
+    label: 'Marketplace for local food producers selling directly to restaurants',
+    demoIndex: 2,
+  },
 ]
 
 const PHASES = [
@@ -31,9 +40,9 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [loadingDots, setLoadingDots] = useState('')
   const [error, setError] = useState('')
+  const [demoLoadingIndex, setDemoLoadingIndex] = useState<number | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // Boot sequence animation
   useEffect(() => {
     let idx = 0
     const interval = setInterval(() => {
@@ -47,7 +56,6 @@ export default function HomePage() {
     return () => clearInterval(interval)
   }, [])
 
-  // Loading dots animation
   useEffect(() => {
     if (!isLoading) return
     let count = 0
@@ -83,6 +91,27 @@ export default function HomePage() {
     }
   }
 
+  const handleDemoLaunch = async (demoIndex: number) => {
+    if (isLoading || demoLoadingIndex !== null) return
+    setDemoLoadingIndex(demoIndex)
+    setError('')
+
+    try {
+      const res = await fetch(`/api/demo/${demoIndex}`, { method: 'POST' })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.detail || 'Failed to launch demo')
+      }
+
+      const data = await res.json()
+      router.push(`/mission/${data.mission_id}`)
+    } catch (err: any) {
+      setError(err.message || 'Demo launch failed.')
+      setDemoLoadingIndex(null)
+    }
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       handleSubmit()
@@ -94,7 +123,6 @@ export default function HomePage() {
 
   return (
     <main className={styles.main}>
-      {}
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <span className={styles.logo}>PROMETHEUS</span>
@@ -111,9 +139,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      {}
       <div className={styles.content}>
-        {}
         <div className={styles.badges}>
           <span className={styles.badge}>
             <span className={styles.badgeDot} style={{ background: 'var(--cod-red)' }}></span>
@@ -129,7 +155,6 @@ export default function HomePage() {
           </span>
         </div>
 
-        {}
         <h1 className={styles.headline}>DEFINE YOUR TARGET</h1>
         <p className={styles.description}>
           Enter a plain-English business problem. PROMETHEUS generates a complete company,
@@ -137,26 +162,24 @@ export default function HomePage() {
           and deploys the survivor.
         </p>
 
-        {}
         <div className={styles.examples}>
-          <span className={styles.examplesLabel}>EXAMPLE MISSIONS:</span>
+          <span className={styles.examplesLabel}>⚡ INSTANT DEMO — ZERO API CALLS:</span>
           <div className={styles.examplePills}>
             {EXAMPLE_MISSIONS.map((ex, i) => (
               <button
                 key={i}
-                className={styles.examplePill}
-                onClick={() => {
-                  setPrompt(ex)
-                  textareaRef.current?.focus()
-                }}
+                className={`${styles.examplePill} ${demoLoadingIndex === i ? styles.examplePillLoading : ''}`}
+                onClick={() => handleDemoLaunch(ex.demoIndex)}
+                disabled={isLoading || demoLoadingIndex !== null}
+                id={`demo-mission-btn-${i}`}
               >
-                {ex.slice(0, 55)}...
+                {demoLoadingIndex === i ? '⚡ LAUNCHING...' : `▶ ${ex.label.slice(0, 52)}...`}
               </button>
             ))}
           </div>
+          <span className={styles.examplesSubLabel}>or type your own idea below and INITIATE MISSION</span>
         </div>
 
-        {}
         <div className={styles.inputGroup}>
           <div className={styles.inputHeader}>
             <label className={styles.inputLabel}>TARGET DESCRIPTION</label>
@@ -179,7 +202,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {}
         {error && (
           <div className={styles.errorBox}>
             <span className={styles.errorIcon}>⚠</span>
@@ -187,7 +209,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {}
         <button
           className={`${styles.launchBtn} ${!prompt.trim() || isLoading ? styles.launchBtnDisabled : ''}`}
           onClick={handleSubmit}
@@ -201,7 +222,6 @@ export default function HomePage() {
           )}
         </button>
 
-        {}
         <div className={styles.phaseSection}>
           <div className={styles.phaseSectionHeader}>
             <span className={styles.phaseSectionTitle}>THREAT ASSESSMENT PIPELINE</span>
@@ -223,11 +243,10 @@ export default function HomePage() {
         </div>
       </div>
 
-      {}
       <footer className={styles.footer}>
         <span>PROMETHEUS ADVERSARIAL VENTURE ENGINE</span>
         <span className={styles.footerSep}>|</span>
-        <span>Powered by Claude claude-sonnet-4-6 · LangGraph · FastAPI · Next.js</span>
+        <span>Powered by Gemini 2.0 Flash · LangGraph · FastAPI · Next.js</span>
         <span className={styles.footerSep}>|</span>
         <span>COST: $0.00</span>
       </footer>
