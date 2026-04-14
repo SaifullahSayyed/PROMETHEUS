@@ -1,0 +1,7 @@
+﻿python : INFO:     Started server process [36592]
+    + CategoryInfo          : NotSpecified: (INFO:     Started server process [36592]:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)

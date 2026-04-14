@@ -1,0 +1,9 @@
+﻿
+> prometheus-frontend@1.0.0 dev
+> next dev
+
+  Γû▓ Next.js 14.2.0
+  - Local:        http://localhost:3000
+
+ Γ£ô Starting...
+ Γ£ô Ready in 1728ms

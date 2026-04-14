@@ -1,0 +1,105 @@
+.container {
+  background: var(--cod-surface);
+  border: 1px solid var(--cod-border);
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--cod-border);
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--cod-white);
+  letter-spacing: 2px;
+}
+
+.cursor {
+  animation: blink 1s step-end infinite;
+  color: var(--cod-green);
+}
+
+.liveIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--cod-red);
+  letter-spacing: 1px;
+}
+
+.liveDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cod-red);
+  animation: pulseRed 1s ease-in-out infinite;
+}
+
+.logArea {
+  height: 300px;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.emptyText {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--cod-steel-dim);
+}
+
+.logEntry {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 6px;
+  animation: slideInLeft 0.25s ease forwards;
+  line-height: 1.5;
+  flex-wrap: wrap;
+}
+
+.timestamp {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--cod-steel-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.agentBadge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+}
+
+.message {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  flex: 1;
+  word-break: break-word;
+  line-height: 1.5;
+}

@@ -1,0 +1,11 @@
+node_modules/
+.next/
+__pycache__/
+*.pyc
+.env
+*.db
+*.log
+backend_out.log
+backend_err.log
+frontend_out.log
+frontend_err.log

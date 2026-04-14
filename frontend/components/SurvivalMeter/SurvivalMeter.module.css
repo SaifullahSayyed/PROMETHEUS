@@ -1,0 +1,168 @@
+.container {
+  background: var(--cod-surface);
+  border: 1px solid var(--cod-border);
+  padding: 28px 24px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s;
+}
+
+.containerComplete {
+  border-color: var(--cod-green);
+  box-shadow: 0 0 30px rgba(74, 255, 145, 0.15);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--cod-steel);
+  letter-spacing: 4px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* MISSION ACCOMPLISHED banner */
+.accomplishedBanner {
+  text-align: center;
+  font-family: var(--font-orbitron);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cod-green);
+  letter-spacing: 4px;
+  padding: 8px;
+  background: rgba(74, 255, 145, 0.08);
+  border: 1px solid var(--cod-green-dim);
+  margin-bottom: 20px;
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(74, 255, 145, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(74, 255, 145, 0.5); }
+}
+
+/* Score display */
+.scoreRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 20px;
+  line-height: 1;
+}
+
+.scoreNum {
+  font-family: var(--font-orbitron);
+  font-size: 80px;
+  font-weight: 700;
+  line-height: 1;
+  transition: color 0.5s;
+  text-shadow: 0 0 20px currentColor;
+}
+
+.scorePercent {
+  font-family: var(--font-orbitron);
+  font-size: 28px;
+  font-weight: 500;
+  margin-top: 12px;
+  transition: color 0.5s;
+}
+
+/* Progress bar */
+.barTrack {
+  height: 8px;
+  background: var(--cod-dark);
+  border: 1px solid var(--cod-border);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s;
+  min-width: 2px;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--cod-steel);
+}
+
+.statValue {
+  color: var(--cod-white);
+  font-weight: 700;
+}
+
+.statSep {
+  color: var(--cod-border-bright);
+}
+
+.statLabel {
+  letter-spacing: 1px;
+  margin-left: 8px;
+}
+
+.criticalWarning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--cod-red);
+  letter-spacing: 1px;
+}
+
+.criticalDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cod-red);
+  animation: pulseRed 1s ease-in-out infinite;
+}
+
+/* Zone segments */
+.segments {
+  display: flex;
+  gap: 4px;
+}
+
+.segment {
+  flex: 1;
+  height: 4px;
+  background: var(--cod-border);
+  position: relative;
+  transition: background 0.5s;
+}
+
+.segmentActive {
+  /* background set inline */
+}
+
+.segmentLabel {
+  display: none;
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--cod-steel-dim);
+  white-space: nowrap;
+}
+
+.segment:hover .segmentLabel {
+  display: block;
+}
