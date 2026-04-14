@@ -94,7 +94,7 @@ export default function HomePage() {
 
   return (
     <main className={styles.main}>
-      {/* Header */}
+      {}
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <span className={styles.logo}>PROMETHEUS</span>
@@ -111,9 +111,9 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Content */}
+      {}
       <div className={styles.content}>
-        {/* Badges */}
+        {}
         <div className={styles.badges}>
           <span className={styles.badge}>
             <span className={styles.badgeDot} style={{ background: 'var(--cod-red)' }}></span>
@@ -129,7 +129,7 @@ export default function HomePage() {
           </span>
         </div>
 
-        {/* Headline */}
+        {}
         <h1 className={styles.headline}>DEFINE YOUR TARGET</h1>
         <p className={styles.description}>
           Enter a plain-English business problem. PROMETHEUS generates a complete company,
@@ -137,7 +137,7 @@ export default function HomePage() {
           and deploys the survivor.
         </p>
 
-        {/* Examples */}
+        {}
         <div className={styles.examples}>
           <span className={styles.examplesLabel}>EXAMPLE MISSIONS:</span>
           <div className={styles.examplePills}>
@@ -156,7 +156,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Input */}
+        {}
         <div className={styles.inputGroup}>
           <div className={styles.inputHeader}>
             <label className={styles.inputLabel}>TARGET DESCRIPTION</label>
@@ -179,7 +179,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Error */}
+        {}
         {error && (
           <div className={styles.errorBox}>
             <span className={styles.errorIcon}>⚠</span>
@@ -187,7 +187,7 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Launch button */}
+        {}
         <button
           className={`${styles.launchBtn} ${!prompt.trim() || isLoading ? styles.launchBtnDisabled : ''}`}
           onClick={handleSubmit}
@@ -201,7 +201,7 @@ export default function HomePage() {
           )}
         </button>
 
-        {/* Phase tracker */}
+        {}
         <div className={styles.phaseSection}>
           <div className={styles.phaseSectionHeader}>
             <span className={styles.phaseSectionTitle}>THREAT ASSESSMENT PIPELINE</span>
@@ -223,7 +223,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Footer */}
+      {}
       <footer className={styles.footer}>
         <span>PROMETHEUS ADVERSARIAL VENTURE ENGINE</span>
         <span className={styles.footerSep}>|</span>

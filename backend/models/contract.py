@@ -1,21 +1,15 @@
 from pydantic import BaseModel, Field
 from typing import Literal, Optional, Dict, List, Any
-
-
 class Feature(BaseModel):
     id: str = Field(description="Unique feature ID like feat_001")
     name: str
     description: str
     priority: Literal["P0", "P1", "P2"]
     user_story: str = Field(description="As a [user], I want to [action] so that [benefit]")
-
-
 class UserJourney(BaseModel):
     persona: str
     steps: List[str]
     success_condition: str
-
-
 class Column(BaseModel):
     name: str
     sql_type: str = Field(
@@ -25,14 +19,10 @@ class Column(BaseModel):
     primary_key: bool = False
     foreign_key: Optional[str] = None
     index: bool = False
-
-
 class Table(BaseModel):
     name: str
     columns: List[Column]
     relationships: List[str] = Field(default_factory=list)
-
-
 class Endpoint(BaseModel):
     method: Literal["GET", "POST", "PUT", "PATCH", "DELETE"]
     path: str
@@ -40,32 +30,24 @@ class Endpoint(BaseModel):
     auth_required: bool
     request_schema: Optional[Dict[str, Any]] = None
     response_schema: Optional[Dict[str, Any]] = None
-
-
 class TechStack(BaseModel):
     frontend: str
     backend: str
     database: str
     auth: str
     hosting: str
-
-
 class PricingTier(BaseModel):
     name: str
     price_monthly_usd: float
     price_annual_usd: float
     features: List[str]
     target_segment: str
-
-
 class Amendment(BaseModel):
     timestamp: str
     agent: str
     field_changed: str
     reason: str
     new_value: str
-
-
 class SharedContract(BaseModel):
     company_name: str
     tagline: str

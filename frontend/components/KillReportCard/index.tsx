@@ -42,7 +42,7 @@ export default function KillReportCard({ report, isNew }: KillReportCardProps) {
       className={`${styles.card} ${isNew ? styles.cardNew : ''} ${isDismissed ? styles.cardDismissed : ''} ${isPatched ? styles.cardPatched : ''}`}
       style={{ borderLeftColor: severityColor }}
     >
-      {/* Kill potential bar */}
+      {}
       <div className={styles.killBar}>
         <div
           className={styles.killBarFill}
@@ -53,7 +53,7 @@ export default function KillReportCard({ report, isNew }: KillReportCardProps) {
         ></div>
       </div>
 
-      {/* Header */}
+      {}
       <div className={styles.header}>
         <span className={styles.criticName} style={{ color: meta.color }}>
           {meta.label}
@@ -63,13 +63,13 @@ export default function KillReportCard({ report, isNew }: KillReportCardProps) {
         </span>
       </div>
 
-      {/* Title */}
+      {}
       <div className={styles.title}>{report.title}</div>
 
-      {/* Description */}
+      {}
       <div className={styles.description}>{report.description}</div>
 
-      {/* Status row */}
+      {}
       <div className={styles.statusRow}>
         <span className={`${styles.statusBadge} ${styles[statusMeta.className]}`}>
           {statusMeta.label}
@@ -79,7 +79,7 @@ export default function KillReportCard({ report, isNew }: KillReportCardProps) {
         </span>
       </div>
 
-      {/* Patch description */}
+      {}
       {isPatched && report.patch_description && (
         <div className={styles.patchNote}>
           <span className={styles.patchIcon}>✓</span>
@@ -87,7 +87,7 @@ export default function KillReportCard({ report, isNew }: KillReportCardProps) {
         </div>
       )}
 
-      {/* Dismiss note */}
+      {}
       {isDismissed && report.challenge_argument && (
         <div className={styles.dismissNote}>
           <span className={styles.dismissIcon}>↩</span>

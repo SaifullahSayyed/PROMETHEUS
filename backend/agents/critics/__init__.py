@@ -1,5 +1,4 @@
 from . import security, product, compliance, scalability, business
-
 CRITICS = {
     "SECURITY": security.run,
     "PRODUCT": product.run,

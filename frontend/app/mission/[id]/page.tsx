@@ -41,7 +41,6 @@ export default function MissionPage() {
   const [contractExpanded, setContractExpanded] = useState(false)
   const [seenReports, setSeenReports] = useState<Set<string>>(new Set())
 
-  // Track new kill reports for animations
   useEffect(() => {
     if (!mission?.kill_reports) return
     const newIds = mission.kill_reports.map(r => r.id)
@@ -77,7 +76,7 @@ export default function MissionPage() {
 
   return (
     <div className={styles.root}>
-      {/* HEADER */}
+      {}
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <span className={styles.headerLogo}>PROMETHEUS</span>
@@ -95,16 +94,16 @@ export default function MissionPage() {
         </div>
       </header>
 
-      {/* 3-COLUMN WAR ROOM */}
+      {}
       <div className={styles.warRoom}>
-        {/* LEFT COLUMN */}
+        {}
         <aside className={styles.leftCol}>
           <PhaseTracker currentPhase={mission.current_phase} status={mission.status} />
         </aside>
 
-        {/* CENTER COLUMN */}
+        {}
         <main className={styles.centerCol}>
-          {/* Company reveal */}
+          {}
           {mission.contract?.company_name && (
             <div className={styles.companyReveal}>
               <span className={styles.companyLabel}>TARGET IDENTIFIED</span>
@@ -115,7 +114,7 @@ export default function MissionPage() {
             </div>
           )}
 
-          {/* Survival meter */}
+          {}
           <SurvivalMeter
             score={mission.survival_score}
             resolved={resolvedCount}
@@ -123,10 +122,10 @@ export default function MissionPage() {
             status={mission.status}
           />
 
-          {/* Combat log */}
+          {}
           <CombatLog logs={mission.combat_log || []} />
 
-          {/* Deploy section */}
+          {}
           <DeployButton
             score={mission.survival_score}
             deployUrl={mission.deploy_url}
@@ -135,7 +134,7 @@ export default function MissionPage() {
             isFailed={mission.status === 'FAILED'}
           />
 
-          {/* Error */}
+          {}
           {mission.status === 'FAILED' && mission.error && (
             <div className={styles.errorBox}>
               <span className={styles.errorLabel}>MISSION FAILED</span>
@@ -144,9 +143,9 @@ export default function MissionPage() {
           )}
         </main>
 
-        {/* RIGHT COLUMN */}
+        {}
         <aside className={styles.rightCol}>
-          {/* Kill reports feed */}
+          {}
           <div className={styles.rightSection}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionTitle}>THREAT INTELLIGENCE</span>
@@ -174,7 +173,7 @@ export default function MissionPage() {
             </div>
           </div>
 
-          {/* Contract viewer */}
+          {}
           {mission.contract && (
             <div className={styles.contractSection}>
               <button

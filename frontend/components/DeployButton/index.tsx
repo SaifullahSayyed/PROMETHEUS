@@ -18,7 +18,7 @@ interface DeployButtonProps {
 }
 
 export default function DeployButton({ score, deployUrl, onDeploy, isDeploying, isFailed }: DeployButtonProps) {
-  // All hooks must be at the top, before any conditional returns
+  
   const [msgIdx, setMsgIdx] = useState(0)
 
   useEffect(() => {
@@ -29,7 +29,6 @@ export default function DeployButton({ score, deployUrl, onDeploy, isDeploying, 
     return () => clearInterval(interval)
   }, [isDeploying])
 
-  // FAILED state — show abort guidance instead of deploy button
   if (isFailed) {
     return (
       <div className={styles.failedContainer}>
@@ -44,7 +43,6 @@ export default function DeployButton({ score, deployUrl, onDeploy, isDeploying, 
     )
   }
 
-  // SUCCESS state — has a live deploy URL
   if (deployUrl) {
     return (
       <div className={styles.successContainer}>
@@ -69,7 +67,6 @@ export default function DeployButton({ score, deployUrl, onDeploy, isDeploying, 
     )
   }
 
-  // DEPLOYING state
   if (isDeploying) {
     return (
       <div className={styles.deployingContainer}>
@@ -79,7 +76,6 @@ export default function DeployButton({ score, deployUrl, onDeploy, isDeploying, 
     )
   }
 
-  // READY state — score hit 100
   if (score >= 100) {
     return (
       <button
@@ -92,7 +88,6 @@ export default function DeployButton({ score, deployUrl, onDeploy, isDeploying, 
     )
   }
 
-  // LOCKED state — defense loop running
   return (
     <div className={styles.lockedContainer}>
       <div className={styles.lockedBar}>

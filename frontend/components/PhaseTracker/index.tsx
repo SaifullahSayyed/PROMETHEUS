@@ -16,11 +16,11 @@ function getPhaseStatus(phaseKey: string, currentPhase: string, missionStatus: s
   const phaseIdx = PHASE_ORDER.indexOf(phaseKey)
 
   if (missionStatus === 'FAILED') {
-    // Only the phase that was running shows as failed
+    
     if (phaseKey === currentPhase) return 'failed'
-    // Phases before the failed one show as complete
+    
     if (phaseIdx < currentIdx) return 'complete'
-    // Phases after remain pending
+    
     return 'pending'
   }
 
@@ -30,7 +30,6 @@ function getPhaseStatus(phaseKey: string, currentPhase: string, missionStatus: s
   if (phaseKey === currentPhase) return 'active'
   return 'pending'
 }
-
 
 interface PhaseTrackerProps {
   currentPhase: string
@@ -68,7 +67,7 @@ export default function PhaseTracker({ currentPhase, status }: PhaseTrackerProps
         })}
       </div>
 
-      {/* Agent roster */}
+      {}
       <div className={styles.agentRoster}>
         <div className={styles.rosterHeader}>
           <span className={styles.rosterTitle}>CRITIC COUNCIL</span>

@@ -2,16 +2,11 @@ import asyncio
 import json
 import re
 from typing import Dict, Callable, Any
-
 from llm import gemini_generate
 from models.contract import SharedContract
 from models.mission import Mission
-
-
 def _extract_json(text: str) -> str:
-    """Extract JSON from text that may contain markdown fences."""
     text = text.strip()
-    # Remove markdown fences if present
     if text.startswith("```"):
         lines = text.split("\n")
         if lines[0].startswith("```"):
@@ -19,17 +14,12 @@ def _extract_json(text: str) -> str:
         if lines and lines[-1].strip() == "```":
             lines = lines[:-1]
         text = "\n".join(lines).strip()
-    # Try to find the outermost JSON object
     match = re.search(r'\{.*\}', text, re.DOTALL)
     if match:
         return match.group(0)
     return text
-
-
 BLUEPRINT_SYSTEM = """You are a world-class CTO and business architect with 20 years of experience building startups from zero to unicorn. You have worked at Google, Stripe, Airbnb, and advised 200+ startups. Your job is to take a raw business idea and instantly produce a precise, fully-specified company blueprint.
-
 You must output ONLY raw valid JSON matching the SharedContract schema — absolutely no markdown, no explanation, no code fences, no preamble. Only a single JSON object starting with { and ending with }.
-
 The JSON must contain these exact top-level fields:
 - company_name: A creative, memorable brand name. NOT generic. Think Stripe, Notion, Figma, Vercel, Linear.
 - tagline: A single sentence that explains the product. Max 12 words. Punchy and specific.
@@ -47,17 +37,9 @@ The JSON must contain these exact top-level fields:
 - known_risks: Array of 3-5 specific business/technical risks unique to this domain.
 - amendments: Empty array []
 - version: 1
-
 Output ONLY the JSON. Nothing else. No explanation. No markdown. Raw JSON starting with { and ending with }."""
-
-
 async def generate_contract(prompt: str, mission: Mission, emit_fn: Callable) -> SharedContract:
-    """
-    Generate a SharedContract from a plain-English problem statement.
-    Uses Gemini 2.0 Flash (free tier) to produce a structured company blueprint.
-    """
     user_message = f"""Problem statement: {prompt}
-
 Generate the complete SharedContract JSON for this business. Remember:
 - Choose a tech stack that actually makes sense for this specific problem domain
 - Write real SQL column types (UUID, VARCHAR(255), DECIMAL(10,2), TIMESTAMPTZ, JSONB)
@@ -66,15 +48,12 @@ Generate the complete SharedContract JSON for this business. Remember:
 - Identify ALL compliance requirements
 - Name at least 3 real business risks specific to this exact domain
 - Use a company_name that sounds like a funded startup
-
 Output ONLY the raw JSON object. No markdown. No explanation."""
-
     await emit_fn("log_entry", {
         "agent": "BUILDER",
         "message": "Calling Gemini 2.0 Flash to generate company blueprint...",
         "level": "INFO"
     })
-
     raw = await gemini_generate(
         prompt=user_message,
         system_prompt=BLUEPRINT_SYSTEM,
@@ -82,13 +61,11 @@ Output ONLY the raw JSON object. No markdown. No explanation."""
         temperature=0.7,
     )
     raw = _extract_json(raw)
-
     await emit_fn("log_entry", {
         "agent": "BUILDER",
         "message": "Blueprint JSON received. Parsing...",
         "level": "INFO"
     })
-
     try:
         data = json.loads(raw)
         contract = SharedContract(**data)
@@ -99,20 +76,15 @@ Output ONLY the raw JSON object. No markdown. No explanation."""
         })
         return contract
     except Exception as e:
-        # Retry once with error context
         await emit_fn("log_entry", {
             "agent": "BUILDER",
             "message": f"Parse failed: {e}. Retrying...",
             "level": "WARNING"
         })
-
         retry_message = f"""Problem statement: {prompt}
-
 PREVIOUS ATTEMPT FAILED WITH ERROR: {str(e)}
-
 The previous JSON had a parsing error. Fix it and output ONLY valid JSON matching the SharedContract schema.
-No markdown. No explanation. Raw JSON only starting with {{ and ending with }}."""
-
+No markdown. No explanation. Raw JSON only starting with {  and ending with } ."""
         raw2 = await gemini_generate(
             prompt=retry_message,
             system_prompt=BLUEPRINT_SYSTEM,
@@ -128,14 +100,7 @@ No markdown. No explanation. Raw JSON only starting with {{ and ending with }}."
             "level": "SUCCESS"
         })
         return contract2
-
-
 async def construct_codebase(contract: SharedContract, mission: Mission, emit_fn: Callable) -> Dict[str, str]:
-    """
-    Run 4 parallel sub-agents to generate the full codebase.
-    Returns a merged dict of {filename: content}.
-    """
-
     async def generate_frontend(contract: SharedContract) -> Dict[str, str]:
         await emit_fn("log_entry", {
             "agent": "BUILDER",
@@ -143,26 +108,19 @@ async def construct_codebase(contract: SharedContract, mission: Mission, emit_fn
             "level": "INFO"
         })
         system = "You are a senior frontend engineer. Generate a complete, production-quality Next.js 14 TypeScript application based on this company blueprint. Every page must have real UI with real components. Use Tailwind CSS. Output each file as a JSON object: {filename: content}. Output ONLY the JSON object, nothing else. No markdown, no explanation."
-
         features_str = "\n".join([f"- {f.name}: {f.description}" for f in contract.core_features])
         endpoints_str = "\n".join([f"- {e.method} {e.path}: {e.description}" for e in contract.api_endpoints])
         pricing_str = "\n".join([f"- {p.name}: ${p.price_monthly_usd}/mo" for p in contract.pricing_tiers])
-
         prompt = f"""{system}
-
 Company: {contract.company_name}
 Tagline: {contract.tagline}
 Tech Stack Frontend: {contract.tech_stack.frontend}
-
 Features:
 {features_str}
-
 API Endpoints:
 {endpoints_str}
-
 Pricing:
 {pricing_str}
-
 Generate a complete Next.js 14 TypeScript app with:
 1. app/page.tsx — Landing page with hero section, features grid, pricing table, CTA buttons
 2. app/dashboard/page.tsx — Main application dashboard
@@ -172,22 +130,18 @@ Generate a complete Next.js 14 TypeScript app with:
 6. lib/api.ts — Complete typed API client
 7. package.json — All dependencies
 8. next.config.js — Next.js config
-
 Output ONLY a single JSON object mapping filename to file content."""
-
         try:
             raw = await gemini_generate(prompt=prompt, max_output_tokens=8000, temperature=0.5)
             return json.loads(_extract_json(raw))
         except Exception:
             return {"frontend/README.md": f"# {contract.company_name} Frontend\n\nGenerated Next.js application for {contract.company_name}."}
-
     async def generate_backend(contract: SharedContract) -> Dict[str, str]:
         await emit_fn("log_entry", {
             "agent": "BUILDER",
             "message": "Sub-agent BACKEND: generating FastAPI application...",
             "level": "INFO"
         })
-
         endpoints_str = "\n".join([
             f"- {e.method} {e.path}: {e.description} (auth: {e.auth_required})"
             for e in contract.api_endpoints
@@ -196,19 +150,14 @@ Output ONLY a single JSON object mapping filename to file content."""
             f"- {t.name}: " + ", ".join([f"{c.name} {c.sql_type}" for c in t.columns[:5]])
             for t in contract.database_schema
         ])
-
-        prompt = f"""You are a senior backend engineer. Generate a complete FastAPI Python application. Output ONLY a JSON object: {{filename: content}}. No markdown.
-
+        prompt = f"""You are a senior backend engineer. Generate a complete FastAPI Python application. Output ONLY a JSON object: { filename: content} . No markdown.
 Company: {contract.company_name}
 Backend Tech: {contract.tech_stack.backend}
 Database: {contract.tech_stack.database}
-
 API Endpoints:
 {endpoints_str}
-
 Database Tables:
 {tables_str}
-
 Generate:
 1. backend/main.py — FastAPI app with all endpoints fully implemented
 2. backend/models.py — SQLAlchemy ORM models
@@ -216,22 +165,18 @@ Generate:
 4. backend/schemas.py — Pydantic schemas
 5. backend/auth.py — JWT authentication
 6. backend/requirements.txt — All pip dependencies
-
 Output ONLY a single JSON object mapping filename to file content."""
-
         try:
             raw = await gemini_generate(prompt=prompt, max_output_tokens=8000, temperature=0.5)
             return json.loads(_extract_json(raw))
         except Exception:
             return {"backend/README.md": f"# {contract.company_name} Backend\n\nGenerated FastAPI application."}
-
     async def generate_database(contract: SharedContract) -> Dict[str, str]:
         await emit_fn("log_entry", {
             "agent": "BUILDER",
             "message": "Sub-agent DATABASE: generating SQL migrations...",
             "level": "INFO"
         })
-
         tables_str = "\n".join([
             f"Table: {t.name}\nColumns: " + "\n  ".join([
                 f"{c.name} {c.sql_type} {'PRIMARY KEY' if c.primary_key else ''} {'NOT NULL' if not c.nullable else ''}"
@@ -239,18 +184,13 @@ Output ONLY a single JSON object mapping filename to file content."""
             ])
             for t in contract.database_schema
         ])
-
-        prompt = f"""You are a senior database engineer. Generate complete SQL migration files for SQLite. Output ONLY a JSON object: {{filename: content}}. No markdown.
-
+        prompt = f"""You are a senior database engineer. Generate complete SQL migration files for SQLite. Output ONLY a JSON object: { filename: content} . No markdown.
 Database Schema for {contract.company_name}:
 {tables_str}
-
 Generate:
 1. migrations/001_create_tables.sql — CREATE TABLE statements with constraints and indexes
 2. migrations/002_seed_data.sql — INSERT statements with 10-15 rows of realistic seed data
-
 Output ONLY a single JSON object mapping filename to file content."""
-
         try:
             raw = await gemini_generate(prompt=prompt, max_output_tokens=4000, temperature=0.3)
             return json.loads(_extract_json(raw))
@@ -259,14 +199,12 @@ Output ONLY a single JSON object mapping filename to file content."""
                 "migrations/001_create_tables.sql": f"-- {contract.company_name} Database Schema\n",
                 "migrations/002_seed_data.sql": f"-- {contract.company_name} Seed Data\n"
             }
-
     async def generate_docs(contract: SharedContract) -> Dict[str, str]:
         await emit_fn("log_entry", {
             "agent": "BUILDER",
             "message": "Sub-agent DOCS: generating documentation...",
             "level": "INFO"
         })
-
         endpoints_str = "\n".join([
             f"### {e.method} {e.path}\n{e.description}\n- Auth required: {e.auth_required}"
             for e in contract.api_endpoints
@@ -275,28 +213,21 @@ Output ONLY a single JSON object mapping filename to file content."""
             f"- **{p.name}**: ${p.price_monthly_usd}/mo — {p.target_segment}"
             for p in contract.pricing_tiers
         ])
-
-        prompt = f"""You are a senior technical writer. Generate complete documentation files. Output ONLY a JSON object: {{filename: content}}. No markdown fences.
-
+        prompt = f"""You are a senior technical writer. Generate complete documentation files. Output ONLY a JSON object: { filename: content} . No markdown fences.
 Company: {contract.company_name}
 Tagline: {contract.tagline}
 Problem: {contract.problem_statement}
 Tech Stack: Frontend={contract.tech_stack.frontend}, Backend={contract.tech_stack.backend}
 Revenue: {contract.revenue_model}
-
 API Endpoints:
 {endpoints_str}
-
 Pricing:
 {pricing_str}
-
 Generate:
 1. README.md — Setup instructions, what it does, how to run
 2. COMPANY_BRIEF.md — Professional one-page company overview
 3. API_REFERENCE.md — Full API documentation
-
 Output ONLY a single JSON object mapping filename to file content."""
-
         try:
             raw = await gemini_generate(prompt=prompt, max_output_tokens=4000, temperature=0.5)
             return json.loads(_extract_json(raw))
@@ -306,15 +237,11 @@ Output ONLY a single JSON object mapping filename to file content."""
                 "COMPANY_BRIEF.md": f"# {contract.company_name} — Company Brief\n\n{contract.tagline}",
                 "API_REFERENCE.md": f"# {contract.company_name} API Reference\n\n"
             }
-
-    # Run sub-agents sequentially to respect Gemini free-tier rate limits (15 RPM)
-    # The semaphore in llm.py handles concurrency, but sequential launch also helps
     await emit_fn("log_entry", {
         "agent": "BUILDER",
         "message": "Launching build agents sequentially: Frontend → Backend → Database → Docs",
         "level": "INFO"
     })
-
     results = []
     for coro, name in [
         (generate_frontend(contract), "FRONTEND"),
@@ -327,7 +254,6 @@ Output ONLY a single JSON object mapping filename to file content."""
             results.append(result)
         except Exception as e:
             results.append(e)
-
     merged: Dict[str, str] = {}
     agent_names = ["FRONTEND", "BACKEND", "DATABASE", "DOCS"]
     for i, result in enumerate(results):
@@ -344,5 +270,4 @@ Output ONLY a single JSON object mapping filename to file content."""
                 "message": f"Sub-agent {agent_names[i]} complete: {len(result)} files generated",
                 "level": "SUCCESS"
             })
-
     return merged

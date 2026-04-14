@@ -38,15 +38,13 @@ body {
   font-family: var(--font-rajdhani);
   min-height: 100vh;
   overflow-x: hidden;
-  /* Subtle grid background */
-  background-image:
+    background-image:
     linear-gradient(rgba(74, 255, 145, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(74, 255, 145, 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
   background-position: 0 0;
 }
 
-/* Scanline overlay */
 body::after {
   content: '';
   position: fixed;

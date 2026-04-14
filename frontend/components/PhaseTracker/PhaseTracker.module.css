@@ -18,7 +18,6 @@
   letter-spacing: 3px;
 }
 
-/* Phases */
 .phases {
   padding: 20px 16px;
   display: flex;
@@ -119,7 +118,6 @@
   margin-top: 2px;
 }
 
-/* Agent roster */
 .agentRoster {
   border-top: 1px solid var(--cod-border);
   flex: 1;

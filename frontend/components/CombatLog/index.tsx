@@ -35,7 +35,6 @@ interface CombatLogProps {
 export default function CombatLog({ logs }: CombatLogProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  // Auto-scroll to bottom on new entries
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [logs.length])

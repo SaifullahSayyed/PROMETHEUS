@@ -4,18 +4,13 @@ from datetime import datetime
 import uuid
 from .contract import SharedContract
 from .kill_report import KillReport
-
-
 class LogEntry(BaseModel):
     timestamp: str
     agent: str
     message: str
     level: Literal["INFO", "WARNING", "CRITICAL", "SUCCESS"]
-
-
 class Mission(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
-
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     input_prompt: str
@@ -28,7 +23,6 @@ class Mission(BaseModel):
     deploy_url: Optional[str] = None
     combat_log: List[LogEntry] = Field(default_factory=list)
     error: Optional[str] = None
-
     def add_log(self, agent: str, message: str, level: str = "INFO"):
         self.combat_log.append(LogEntry(
             timestamp=datetime.utcnow().strftime("%H:%M:%S"),
@@ -36,7 +30,6 @@ class Mission(BaseModel):
             message=message,
             level=level
         ))
-
     def recalculate_score(self):
         if not self.kill_reports:
             self.survival_score = 100.0

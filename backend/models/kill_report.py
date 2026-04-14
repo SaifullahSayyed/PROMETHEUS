@@ -1,8 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Literal, Optional
 import uuid
-
-
 class KillReport(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4())[:8])
     critic_type: Literal["SECURITY", "PRODUCT", "COMPLIANCE", "SCALABILITY", "BUSINESS"]

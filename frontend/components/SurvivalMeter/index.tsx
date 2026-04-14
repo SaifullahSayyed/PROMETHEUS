@@ -31,7 +31,7 @@ function useAnimatedScore(targetScore: number) {
     function animate(now: number) {
       const elapsed = now - startTime
       const progress = Math.min(elapsed / duration, 1)
-      // Ease-out cubic
+      
       const eased = 1 - Math.pow(1 - progress, 3)
       const current = start + (end - start) * eased
       setDisplayScore(Math.round(current * 10) / 10)
@@ -79,7 +79,7 @@ export default function SurvivalMeter({ score, resolved, total, status }: Surviv
         <span className={styles.scorePercent} style={{ color }}>%</span>
       </div>
 
-      {/* Progress bar */}
+      {}
       <div className={styles.barTrack}>
         <div
           className={styles.barFill}
@@ -91,7 +91,7 @@ export default function SurvivalMeter({ score, resolved, total, status }: Surviv
         ></div>
       </div>
 
-      {/* Stats */}
+      {}
       <div className={styles.stats}>
         <div className={styles.stat}>
           <span className={styles.statValue}>{resolved}</span>
@@ -107,7 +107,7 @@ export default function SurvivalMeter({ score, resolved, total, status }: Surviv
         )}
       </div>
 
-      {/* Score meter segments */}
+      {}
       <div className={styles.segments}>
         {['CRITICAL', 'DANGER', 'CAUTION', 'STABLE', 'SECURE'].map((zone, i) => {
           const threshold = i * 20

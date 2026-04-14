@@ -22,7 +22,6 @@
   text-align: center;
 }
 
-/* MISSION ACCOMPLISHED banner */
 .accomplishedBanner {
   text-align: center;
   font-family: var(--font-orbitron);
@@ -42,7 +41,6 @@
   50% { box-shadow: 0 0 30px rgba(74, 255, 145, 0.5); }
 }
 
-/* Score display */
 .scoreRow {
   display: flex;
   align-items: flex-start;
@@ -69,7 +67,6 @@
   transition: color 0.5s;
 }
 
-/* Progress bar */
 .barTrack {
   height: 8px;
   background: var(--cod-dark);
@@ -84,7 +81,6 @@
   min-width: 2px;
 }
 
-/* Stats */
 .stats {
   display: flex;
   align-items: center;
@@ -133,7 +129,6 @@
   animation: pulseRed 1s ease-in-out infinite;
 }
 
-/* Zone segments */
 .segments {
   display: flex;
   gap: 4px;
@@ -148,8 +143,7 @@
 }
 
 .segmentActive {
-  /* background set inline */
-}
+  }
 
 .segmentLabel {
   display: none;

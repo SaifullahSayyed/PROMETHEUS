@@ -1,4 +1,3 @@
-/* SUCCESS */
 .successContainer {
   background: rgba(74, 255, 145, 0.05);
   border: 1px solid var(--cod-green);
@@ -68,7 +67,6 @@
   letter-spacing: 1px;
 }
 
-/* DEPLOYING */
 .deployingContainer {
   display: flex;
   align-items: center;
@@ -95,7 +93,6 @@
   letter-spacing: 2px;
 }
 
-/* READY */
 .readyBtn {
   width: 100%;
   background: var(--cod-green);
@@ -126,7 +123,6 @@
   transform: scale(0.99);
 }
 
-/* LOCKED */
 .lockedContainer {
   background: var(--cod-dark);
   border: 1px solid var(--cod-border);
@@ -155,7 +151,6 @@
   letter-spacing: 1px;
 }
 
-/* FAILED / ABORTED */
 .failedContainer {
   display: flex;
   align-items: flex-start;
