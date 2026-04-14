@@ -3,24 +3,24 @@ import styles from './KillReportCard.module.css'
 import { KillReport } from '@/lib/useSSEMission'
 
 const CRITIC_META: Record<string, { label: string; color: string }> = {
-  SECURITY: { label: 'THE BREACH', color: 'var(--cod-red)' },
-  PRODUCT: { label: 'THE ADVOCATE', color: '#7B68EE' },
-  COMPLIANCE: { label: 'THE REGULATOR', color: 'var(--cod-amber)' },
-  SCALABILITY: { label: 'THE ARCHITECT', color: 'var(--cod-cyan)' },
-  BUSINESS: { label: 'THE INVESTOR', color: '#FF69B4' },
+  SECURITY:    { label: 'THE BREACH',    color: 'var(--cod-red)'    },
+  PRODUCT:     { label: 'THE ADVOCATE',  color: 'var(--cod-purple)' },
+  COMPLIANCE:  { label: 'THE REGULATOR', color: 'var(--cod-amber)'  },
+  SCALABILITY: { label: 'THE ARCHITECT', color: 'var(--cod-cyan)'   },
+  BUSINESS:    { label: 'THE INVESTOR',  color: 'var(--cod-pink)'   },
 }
 
 const SEVERITY_COLORS: Record<string, string> = {
   CRITICAL: 'var(--cod-red)',
-  HIGH: 'var(--cod-amber)',
-  MEDIUM: 'var(--cod-steel)',
-  LOW: 'var(--cod-steel-dim)',
+  HIGH:     'var(--cod-amber)',
+  MEDIUM:   'var(--cod-steel)',
+  LOW:      'var(--cod-steel-dim)',
 }
 
 const STATUS_META: Record<string, { label: string; className: string }> = {
-  OPEN: { label: 'OPEN', className: 'statusOpen' },
-  PATCHED: { label: 'PATCHED', className: 'statusPatched' },
-  CHALLENGED: { label: 'CHALLENGED', className: 'statusChallenged' },
+  OPEN:      { label: 'OPEN',      className: 'statusOpen'      },
+  PATCHED:   { label: 'PATCHED',   className: 'statusPatched'   },
+  CHALLENGED:{ label: 'CHALLENGED',className: 'statusChallenged'},
   DISMISSED: { label: 'DISMISSED', className: 'statusDismissed' },
 }
 
@@ -30,64 +30,45 @@ interface KillReportCardProps {
 }
 
 export default function KillReportCard({ report, isNew }: KillReportCardProps) {
-  const meta = CRITIC_META[report.critic_type] || { label: report.critic_type, color: 'var(--cod-steel)' }
+  const meta        = CRITIC_META[report.critic_type] || { label: report.critic_type, color: 'var(--cod-steel)' }
   const severityColor = SEVERITY_COLORS[report.severity] || 'var(--cod-steel)'
-  const statusMeta = STATUS_META[report.status] || STATUS_META.OPEN
-
+  const statusMeta  = STATUS_META[report.status] || STATUS_META.OPEN
+  const isPatched   = report.status === 'PATCHED'
   const isDismissed = report.status === 'DISMISSED'
-  const isPatched = report.status === 'PATCHED'
 
   return (
     <div
       className={`${styles.card} ${isNew ? styles.cardNew : ''} ${isDismissed ? styles.cardDismissed : ''} ${isPatched ? styles.cardPatched : ''}`}
       style={{ borderLeftColor: severityColor }}
     >
-      {}
       <div className={styles.killBar}>
         <div
           className={styles.killBarFill}
-          style={{
-            width: `${(report.kill_potential / 10) * 100}%`,
-            background: severityColor,
-          }}
-        ></div>
+          style={{ width: `${(report.kill_potential / 10) * 100}%`, background: severityColor, color: severityColor }}
+        />
       </div>
 
-      {}
-      <div className={styles.header}>
-        <span className={styles.criticName} style={{ color: meta.color }}>
-          {meta.label}
-        </span>
-        <span className={styles.severity} style={{ color: severityColor, borderColor: severityColor }}>
-          {report.severity}
-        </span>
+      <div className={styles.body}>
+        <div className={styles.header}>
+          <span className={styles.criticName} style={{ color: meta.color }}>{meta.label}</span>
+          <span className={styles.severity} style={{ color: severityColor, borderColor: `${severityColor}60` }}>
+            {report.severity}
+          </span>
+        </div>
+        <div className={styles.title}>{report.title}</div>
+        <div className={styles.description}>{report.description}</div>
+        <div className={styles.statusRow}>
+          <span className={`${styles.statusBadge} ${styles[statusMeta.className]}`}>{statusMeta.label}</span>
+          <span className={styles.killPotential} style={{ color: severityColor }}>KILL: {report.kill_potential}/10</span>
+        </div>
       </div>
 
-      {}
-      <div className={styles.title}>{report.title}</div>
-
-      {}
-      <div className={styles.description}>{report.description}</div>
-
-      {}
-      <div className={styles.statusRow}>
-        <span className={`${styles.statusBadge} ${styles[statusMeta.className]}`}>
-          {statusMeta.label}
-        </span>
-        <span className={styles.killPotential} style={{ color: severityColor }}>
-          KILL: {report.kill_potential}/10
-        </span>
-      </div>
-
-      {}
       {isPatched && report.patch_description && (
         <div className={styles.patchNote}>
           <span className={styles.patchIcon}>✓</span>
           <span>{report.patch_description}</span>
         </div>
       )}
-
-      {}
       {isDismissed && report.challenge_argument && (
         <div className={styles.dismissNote}>
           <span className={styles.dismissIcon}>↩</span>

@@ -1,34 +1,44 @@
 .card {
-  background: var(--cod-surface);
+  background: rgba(10, 12, 16, 0.85);
   border: 1px solid var(--cod-border);
-  border-left: 3px solid var(--cod-steel);
-  padding: 14px;
-  margin-bottom: 10px;
-  animation: slideInFromTop 0.3s ease forwards;
-  transition: all 0.3s;
+  border-left: 2px solid var(--cod-steel-dim);
+  padding: 0;
+  animation: cardDrop 0.35s cubic-bezier(.22,1,.36,1) forwards;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
   position: relative;
   overflow: hidden;
 }
 
-@keyframes slideInFromTop {
-  from {
-    opacity: 0;
-    transform: translateY(-16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.card:hover {
+  border-color: rgba(74,255,145,0.2);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  transform: translateY(-1px);
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 0; height: 0;
+  border-left: 12px solid transparent;
+  border-top: 12px solid var(--cod-border);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@keyframes cardDrop {
+  from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)     scale(1);    }
 }
 
 .cardNew {
-  animation: slideInFromTop 0.3s ease forwards, newCardFlash 0.8s ease forwards;
+  animation: cardDrop 0.35s cubic-bezier(.22,1,.36,1) forwards, newCardFlash 1s ease forwards;
 }
 
 @keyframes newCardFlash {
-  0% { background: var(--cod-surface); }
-  20% { background: rgba(255, 59, 59, 0.1); }
-  100% { background: var(--cod-surface); }
+  0%   { box-shadow: 0 0 0   rgba(255,51,85,0);    }
+  20%  { box-shadow: 0 0 30px rgba(255,51,85,0.3); }
+  100% { box-shadow: 0 0 0   rgba(255,51,85,0);    }
 }
 
 .cardDismissed {
@@ -36,26 +46,29 @@
 }
 
 .cardPatched {
-  animation: patchedFlash 1s ease forwards;
+  animation: cardDrop 0.35s cubic-bezier(.22,1,.36,1) forwards, patchedFlash 1.2s ease forwards;
 }
 
 @keyframes patchedFlash {
-  0% { background: var(--cod-surface); }
-  30% { background: rgba(74, 255, 145, 0.12); }
-  100% { background: var(--cod-surface); }
+  0%   { box-shadow: 0 0 0   rgba(74,255,145,0);    }
+  30%  { box-shadow: 0 0 30px rgba(74,255,145,0.25); }
+  100% { box-shadow: 0 0 0   rgba(74,255,145,0);    }
 }
 
 .killBar {
-  height: 3px;
+  height: 2px;
   background: var(--cod-dark);
-  margin-bottom: 12px;
-  border-radius: 0;
   overflow: hidden;
 }
 
 .killBarFill {
   height: 100%;
-  transition: width 0.5s ease;
+  transition: width 0.8s cubic-bezier(.22,1,.36,1);
+  box-shadow: 0 0 8px currentColor;
+}
+
+.body {
+  padding: 12px 14px;
 }
 
 .header {
@@ -67,34 +80,36 @@
 
 .criticName {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .severity {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
   padding: 2px 8px;
   border: 1px solid;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
 .title {
-  font-family: var(--font-rajdhani);
-  font-size: 15px;
-  font-weight: 600;
+  font-family: var(--font-exo);
+  font-size: 13px;
+  font-weight: 700;
   color: var(--cod-white);
   margin-bottom: 8px;
-  line-height: 1.3;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
 }
 
 .description {
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--cod-steel);
-  line-height: 1.6;
+  line-height: 1.7;
   margin-bottom: 10px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -110,29 +125,30 @@
 
 .statusBadge {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
   padding: 2px 8px;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
 .statusOpen {
   color: var(--cod-red);
-  border: 1px solid var(--cod-red);
-  background: var(--cod-red-dim);
+  border: 1px solid rgba(255,51,85,0.3);
+  background: rgba(255,51,85,0.08);
 }
 
 .statusPatched {
   color: var(--cod-green);
-  border: 1px solid var(--cod-green-dim);
-  background: rgba(74, 255, 145, 0.08);
+  border: 1px solid rgba(74,255,145,0.2);
+  background: rgba(74,255,145,0.07);
+  text-shadow: 0 0 6px rgba(74,255,145,0.4);
 }
 
 .statusChallenged {
   color: var(--cod-amber);
-  border: 1px solid var(--cod-amber-dim);
-  background: var(--cod-amber-dim);
-  animation: blink 1s step-end infinite;
+  border: 1px solid rgba(255,184,0,0.3);
+  background: rgba(255,184,0,0.07);
+  animation: blink 1.2s step-end infinite;
 }
 
 .statusDismissed {
@@ -143,44 +159,42 @@
 
 .killPotential {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 1px;
+  opacity: 0.85;
 }
 
 .patchNote {
   display: flex;
   align-items: flex-start;
-  gap: 6px;
-  margin-top: 10px;
-  padding: 8px;
-  background: rgba(74, 255, 145, 0.05);
-  border-top: 1px solid var(--cod-green-dim);
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(74,255,145,0.04);
+  border-top: 1px solid rgba(74,255,145,0.12);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   color: var(--cod-green);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .patchIcon {
   flex-shrink: 0;
   font-weight: bold;
+  opacity: 0.8;
 }
 
 .dismissNote {
   display: flex;
   align-items: flex-start;
-  gap: 6px;
-  margin-top: 10px;
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.02);
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.01);
   border-top: 1px solid var(--cod-border);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   color: var(--cod-steel-dim);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-.dismissIcon {
-  flex-shrink: 0;
-}
+.dismissIcon { flex-shrink: 0; }

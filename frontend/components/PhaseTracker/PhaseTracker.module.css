@@ -1,25 +1,25 @@
 .container {
-  background: var(--cod-surface);
-  border-right: 1px solid var(--cod-border);
+  background: rgba(8, 10, 14, 0.9);
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .header {
-  padding: 14px 20px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--cod-border);
+  background: rgba(5,6,8,0.6);
 }
 
 .title {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   color: var(--cod-steel);
   letter-spacing: 3px;
 }
 
 .phases {
-  padding: 20px 16px;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -38,36 +38,40 @@
 }
 
 .indicator {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-orbitron);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   border: 1px solid var(--cod-border);
   color: var(--cod-steel-dim);
   background: var(--cod-dark);
-  transition: all 0.3s;
+  transition: all 0.4s;
   flex-shrink: 0;
+  position: relative;
 }
 
 .indicator.complete {
-  background: rgba(74, 255, 145, 0.1);
-  border-color: var(--cod-green);
+  background: rgba(74,255,145,0.08);
+  border-color: rgba(74,255,145,0.4);
   color: var(--cod-green);
+  text-shadow: 0 0 8px rgba(74,255,145,0.6);
+  box-shadow: 0 0 12px rgba(74,255,145,0.1);
 }
 
 .indicator.active {
-  background: rgba(74, 255, 145, 0.15);
+  background: rgba(74,255,145,0.1);
   border-color: var(--cod-green);
   color: var(--cod-green);
+  box-shadow: 0 0 20px rgba(74,255,145,0.2), inset 0 0 10px rgba(74,255,145,0.05);
 }
 
 .indicator.failed {
-  background: var(--cod-red-dim);
-  border-color: var(--cod-red);
+  background: rgba(255,51,85,0.08);
+  border-color: rgba(255,51,85,0.4);
   color: var(--cod-red);
 }
 
@@ -77,43 +81,44 @@
   border-radius: 50%;
   background: var(--cod-green);
   animation: pulseGreen 1.5s ease-in-out infinite;
+  box-shadow: 0 0 10px var(--cod-green);
 }
 
 .connector {
   width: 1px;
-  height: 28px;
+  height: 24px;
   background: var(--cod-border);
-  margin: 4px 0;
-  transition: background 0.3s;
+  margin: 3px 0;
+  transition: background 0.4s;
 }
 
 .connectorComplete {
-  background: var(--cod-green-dim);
+  background: linear-gradient(180deg, rgba(74,255,145,0.4), rgba(74,255,145,0.1));
 }
 
 .phaseInfo {
-  padding-top: 4px;
-  padding-bottom: 28px;
+  padding-top: 5px;
+  padding-bottom: 24px;
 }
 
-.info_pending .phaseName { color: var(--cod-steel-dim); }
-.info_active .phaseName { color: var(--cod-green); }
+.info_pending .phaseName  { color: var(--cod-steel-dim); }
+.info_active  .phaseName  { color: var(--cod-green); text-shadow: 0 0 10px rgba(74,255,145,0.4); }
 .info_complete .phaseName { color: var(--cod-steel); }
-.info_failed .phaseName { color: var(--cod-red); }
+.info_failed  .phaseName  { color: var(--cod-red); }
 
 .phaseName {
   display: block;
   font-family: var(--font-rajdhani);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   letter-spacing: 2px;
-  transition: color 0.3s;
+  transition: color 0.4s, text-shadow 0.4s;
 }
 
 .phaseDesc {
   display: block;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   color: var(--cod-steel-dim);
   margin-top: 2px;
 }
@@ -125,13 +130,14 @@
 }
 
 .rosterHeader {
-  padding: 12px 20px;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--cod-border);
+  background: rgba(5,6,8,0.5);
 }
 
 .rosterTitle {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   color: var(--cod-steel);
   letter-spacing: 3px;
 }
@@ -139,14 +145,15 @@
 .agent {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
+  gap: 10px;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--cod-border);
   transition: background 0.2s;
+  cursor: default;
 }
 
 .agent:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255,255,255,0.015);
 }
 
 .agentDot {
@@ -154,11 +161,11 @@
   height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
-  transition: all 0.3s;
+  transition: all 0.4s;
 }
 
 .agentDotActive {
-  animation: pulseGreen 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px currentColor;
 }
 
 .agentInfo {
@@ -168,16 +175,16 @@
 }
 
 .agentName {
-  font-family: var(--font-rajdhani);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  transition: color 0.3s;
+  font-family: var(--font-exo);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  transition: color 0.4s;
 }
 
 .agentType {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 8px;
   color: var(--cod-steel-dim);
   letter-spacing: 2px;
 }
