@@ -8,8 +8,8 @@ echo.
 if not exist "backend\.env" (
     copy "backend\.env.example" "backend\.env"
     echo.
-    echo ACTION REQUIRED: Add your Anthropic API key to backend\.env
-    echo Get a free key at: https://console.anthropic.com
+    echo ACTION REQUIRED: Add your Google Gemini API key to backend\.env
+    echo Get a free key at: https://aistudio.google.com/app/apikey
     echo.
     pause
 )

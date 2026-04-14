@@ -31,9 +31,9 @@ PROMETHEUS is a fully autonomous venture engine that runs this pipeline on every
 # 1. Clone and enter
 git clone <your-repo-url> prometheus && cd prometheus
 
-# 2. Add your Anthropic API key
+# 2. Add your Google Gemini API key
 cp backend/.env.example backend/.env
-# Edit backend/.env and set ANTHROPIC_API_KEY=sk-ant-api03-...
+# Edit backend/.env and set GEMINI_API_KEY=AIza...
 
 # 3. Run
 start.bat        # Windows
@@ -48,7 +48,7 @@ Then open **http://localhost:3000**
 
 - Python 3.11+
 - Node.js 18+
-- An Anthropic API key (free tier works for demo): https://console.anthropic.com
+- A Google Gemini API key (free tier works perfectly!): https://aistudio.google.com/app/apikey
 
 ---
 
@@ -58,7 +58,7 @@ Then open **http://localhost:3000**
 | Layer | Technology |
 |---|---|
 | Backend | FastAPI 0.110 + Python 3.11 |
-| AI Model | Claude claude-sonnet-4-6 via Anthropic SDK |
+| AI Model | Gemini (e.g., 1.5 Flash) via Google GenAI SDK |
 | Agent Framework | LangGraph 0.1.0 |
 | Data Models | Pydantic v2 |
 | Streaming | Server-Sent Events (SSE) |
@@ -117,7 +117,7 @@ User Input
 
 | Service | Cost |
 |---|---|
-| Anthropic API | Pay-per-token (~$0.01–0.05 per mission depending on size) |
+| Gemini API | Free tier works for development (up to 15 Requests/Min, 1 million Tokens/Min) |
 | Backend hosting | Fly.io free tier OR localhost |
 | Frontend hosting | Vercel free tier OR localhost |
 | Database | SQLite (local file, zero cost) |

@@ -71,6 +71,9 @@ async def gemini_generate(
 
     # Rate-limited execution with exponential backoff
     async with _api_semaphore:
+        # Ensure we don't exceed the 15 RPM limit (4 seconds per request)
+        await asyncio.sleep(4)
+        
         for attempt in range(max_retries):
             try:
                 result = await loop.run_in_executor(None, lambda: _blocking_call(model_name))

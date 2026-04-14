@@ -24,8 +24,8 @@ if [ ! -f "backend/.env" ]; then
     echo "SETUP: Creating backend/.env from template..."
     cp backend/.env.example backend/.env
     echo ""
-    echo "⚠️  ACTION REQUIRED: Add your Anthropic API key to backend/.env"
-    echo "   Get a free key at: https://console.anthropic.com"
+    echo "⚠️  ACTION REQUIRED: Add your Google Gemini API key to backend/.env"
+    echo "   Get a free key at: https://aistudio.google.com/app/apikey"
     echo ""
     read -p "Press ENTER after adding your API key to backend/.env ..."
 fi
